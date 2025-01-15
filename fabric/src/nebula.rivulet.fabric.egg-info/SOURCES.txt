@@ -1,0 +1,15 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+setup.py
+src/__init__.py
+src/database/__init__.py
+src/database/elasticService.py
+src/embedings/__init__.py
+src/embedings/chromaService.py
+src/nebula.rivulet.fabric.egg-info/PKG-INFO
+src/nebula.rivulet.fabric.egg-info/SOURCES.txt
+src/nebula.rivulet.fabric.egg-info/dependency_links.txt
+src/nebula.rivulet.fabric.egg-info/requires.txt
+src/nebula.rivulet.fabric.egg-info/top_level.txt
