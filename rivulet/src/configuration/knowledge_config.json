@@ -1,0 +1,11 @@
+[
+  {
+    "name": "JournalEvents",
+    "query": {
+      "match_all": {}
+    },
+    "questions": [
+      "give me the journal events for event type errors"
+    ]
+  }
+]

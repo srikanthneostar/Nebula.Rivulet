@@ -4,6 +4,8 @@ README.md
 pyproject.toml
 setup.py
 src/__init__.py
+src/configuration/__init__.py
+src/configuration/appConfigProvider.py
 src/database/__init__.py
 src/database/elasticService.py
 src/embedings/__init__.py

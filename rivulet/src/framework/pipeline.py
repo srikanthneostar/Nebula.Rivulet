@@ -3,6 +3,7 @@ import logging
 from .pipeline_stage import PipelineStage
 from .data_source import DataSource
 
+
 class Pipeline:
     def __init__(self, data_source: DataSource):
         self.data_source = data_source

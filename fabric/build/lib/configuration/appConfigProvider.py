@@ -18,10 +18,11 @@ class AppConfigProvider:
     def __init__(self):
         nebula_home = os.environ.get('NEBULA_HOME')
         if not nebula_home:
-            raise EnvironmentError(
-                "NEBULA_HOME environment variable is not defined")
+            raise EnvironmentError("NEBULA_HOME environment variable is not defined")
         self.db_path = f"{nebula_home}/Nebula.Rivulet.db"
         self.create_db()
+
+
 
     def create_db(self):
         if not os.path.exists(self.db_path):
@@ -48,12 +49,11 @@ class AppConfigProvider:
             else:
                 raise ValueError(f"No configuration found for key: {key}")
 
-    def get_config_by_category(self, category: str) -> List[AppConfig]:
+    def get_config_by_category(self,category:str) -> List[AppConfig]:
         configs = []
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute(
-                "SELECT key, value, description,category,isEncrypted FROM appconfig where category=?", (category,))
+            cursor.execute("SELECT key, value, description,category,isEncrypted FROM appconfig where category=?", (category,))
             rows = cursor.fetchall()
             for row in rows:
                 configs.append(AppConfig(
@@ -70,8 +70,7 @@ class AppConfigProvider:
             cursor = conn.cursor()
             cursor.execute(
                 "INSERT INTO appconfig (key, value, description, category, isEncrypted) VALUES (?, ?, ?, ?, ?)",
-                (config.key, config.value, config.description,
-                 config.category, config.isEncrypted)
+                (config.key, config.value, config.description, config.category, config.isEncrypted)
             )
             return cursor.rowcount > 0
 
