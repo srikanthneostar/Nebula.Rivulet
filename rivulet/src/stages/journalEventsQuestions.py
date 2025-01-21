@@ -2,7 +2,8 @@ from framework.pipeline_stage import PipelineStage
 from configuration.appConfigProvider import AppConfigProvider
 from llms.ollamaService import OllamaService
 
-class JournalEventSummary(PipelineStage):
+
+class JournalEventQuestions(PipelineStage):
     def __init__(self):
         appConfigProvider = AppConfigProvider()
         configs = appConfigProvider.get_config_by_category("OLLAMA")
@@ -11,9 +12,9 @@ class JournalEventSummary(PipelineStage):
         self.ollamaService = OllamaService(model_name,host_address)
 
     def process(self, data: any) -> any:
-        summaries = []
+        questions = []
         for event in data:
-            prompt = f"Please provide a concise summary of the following event: {event}"
-            summary = self.ollamaService.ollama_client.generate(prompt)
-            summaries.append({**event, "summary": summary})
-        return summaries
+            prompt = f"Please generate 3 random questions for the following event: {event}"
+            question = self.ollamaService.ollama_client.generate(prompt)
+            questions.append({**event, "similarQuestion": question})
+        return questions
