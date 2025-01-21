@@ -2,9 +2,10 @@ from framework.pipeline_stage import PipelineStage
 from configuration.appConfigProvider import AppConfigProvider
 from ollamaService.ollamaService import OllamaService
 
-class JournalEventsQAstage(PipelineStage):
-    def __init__(self,config:any):
-        self.Configuraiton = config
+from ollama import Client
+
+class JournalEventSummary(PipelineStage):
+    def __init__(self):
         appConfigProvider = AppConfigProvider()
         configs = appConfigProvider.get_config_by_category("OLLAMA")
         host_address = [config for config in configs if config.key == "HOST"][0].value
@@ -12,13 +13,9 @@ class JournalEventsQAstage(PipelineStage):
         self.ollamaService = OllamaService(model_name,host_address)
 
     def process(self, data: any) -> any:
-        questions = self.Configuraiton["questions"]
-        responses = []
-        for question in questions:
-            response = self.ollamaService.query_model(query=question, data=data)
-            responses.append({"question": question, "response": response})
-            
-        return {
-            "data" : data,
-            "response" : responses
-        }
+        summaries = []
+        for event in data:
+            prompt = f"Please provide a concise summary of the following event: {event}"
+            summary = self.ollamaService.ollama_client.generate(prompt)
+            summaries.append(summary)
+        return summaries

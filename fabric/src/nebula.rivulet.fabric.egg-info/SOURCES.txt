@@ -15,3 +15,5 @@ src/nebula.rivulet.fabric.egg-info/SOURCES.txt
 src/nebula.rivulet.fabric.egg-info/dependency_links.txt
 src/nebula.rivulet.fabric.egg-info/requires.txt
 src/nebula.rivulet.fabric.egg-info/top_level.txt
+src/ollamaService/__init__.py
+src/ollamaService/ollamaService.py

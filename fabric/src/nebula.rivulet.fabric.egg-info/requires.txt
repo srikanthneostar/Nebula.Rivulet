@@ -3,6 +3,7 @@ pandas>=1.0.0
 sentence-transformers
 chromadb
 chroma
+ollama
 jq
 langchain
 langchain-community

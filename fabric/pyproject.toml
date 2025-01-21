@@ -15,6 +15,7 @@ dependencies = [
         "sentence-transformers",
         "chromadb",
         "chroma",
+        "ollama",
         "jq",
         "langchain",
         "langchain-community",
