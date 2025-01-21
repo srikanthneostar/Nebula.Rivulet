@@ -10,10 +10,10 @@ src/database/__init__.py
 src/database/elasticService.py
 src/embedings/__init__.py
 src/embedings/chromaService.py
+src/llms/__init__.py
+src/llms/ollamaService.py
 src/nebula.rivulet.fabric.egg-info/PKG-INFO
 src/nebula.rivulet.fabric.egg-info/SOURCES.txt
 src/nebula.rivulet.fabric.egg-info/dependency_links.txt
 src/nebula.rivulet.fabric.egg-info/requires.txt
 src/nebula.rivulet.fabric.egg-info/top_level.txt
-src/ollamaService/__init__.py
-src/ollamaService/ollamaService.py

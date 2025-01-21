@@ -1,6 +1,6 @@
 from framework.pipeline_stage import PipelineStage
 from configuration.appConfigProvider import AppConfigProvider
-from ollamaService.ollamaService import OllamaService
+from llms.ollamaService import OllamaService
 
 from ollama import Client
 
