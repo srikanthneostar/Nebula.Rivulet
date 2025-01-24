@@ -6,6 +6,7 @@
     },
     "questions": [
       "give me the journal events for event type errors"
-    ]
+    ],
+    "prompt" : "You are an intelligent assistant trained to generate meaningful and context-aware questions and generate 3 random questions"
   }
 ]

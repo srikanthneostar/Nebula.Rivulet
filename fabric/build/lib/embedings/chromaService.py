@@ -24,6 +24,7 @@ class ChromaService(ABC):
     def add_documents(self, documents: List[Document], ids=None, persist_path: str = None) -> Chroma:
         return self.langchain_chroma_db.from_documents(
             documents=documents,
+            embedding=self.sentence_Transformer,
             ids=ids,
             persist_directory=persist_path,
         )

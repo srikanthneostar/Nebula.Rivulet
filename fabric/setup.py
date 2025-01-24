@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="nebula-rivulet.fabric",
+    name="nebula.fabric",
     version="3.10.0",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
@@ -11,6 +11,7 @@ setup(
         "sentence-transformers",
         "chromadb",
         "chroma",
+        "ollama",
         "jq",
         "langchain",
         "langchain-community",
