@@ -11,7 +11,7 @@ class ChromaService(ABC):
     def __init__(self, model_name: str, collection_name: str, db_name: str = "nebula"):
         self.sentence_Transformer = SentenceTransformerEmbeddings(model_name=model_name)
 
-        self.chroma_Db = chromadb.PersistentClient(path="./nebula_db", database=db_name)
+        self.chroma_Db = chromadb.PersistentClient(path="./nebula_db")
         self.collection = self.chroma_Db.get_or_create_collection(
             name=collection_name
         )

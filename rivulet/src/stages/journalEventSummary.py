@@ -9,13 +9,14 @@ class JournalEventSummary(PipelineStage):
         host_address = [config for config in configs if config.key == "HOST"][0].value
         model_name = [config for config in configs if config.key == "MODEL"][0].value
         self.ollamaService = OllamaService(model_name,host_address)
-        self.logger = get_fabric_logger(__name__)
+        self.logger = get_fabric_logger(__name__, "C:/Temp/test.log")
 
     def process(self, data: any) -> any:
+        self.logger.info("Journal Event Summary: %s", data)
         summaries = []
         for events in data['data']:
             prompt = "You are an intelligent assistant trained to generate meaningful and context-aware Summary. First, summarize the following content concisely: " + str(events)
             summary = self.ollamaService.ollama_client.generate(model=self.ollamaService.model_name, prompt=prompt)
             summaries.append({**events, "summary": summary})
-        self.logger.info("Journal Event Summary",summaries)
+        self.logger.info("Journal Event Summary: %s", summaries)
         return summaries

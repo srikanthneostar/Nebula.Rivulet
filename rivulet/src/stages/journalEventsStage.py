@@ -13,9 +13,10 @@ class JournalEventsQAstage(PipelineStage):
 
     def process(self, data: any) -> any:
         questions = self.Configuraiton["questions"]
+        prompt = self.Configuraiton["prompt"]
         responses = []
         for question in questions:
-            response = self.ollamaService.query_model(query=question, data=data)
+            response = self.ollamaService.query_model(prompt=prompt,query=question, data=data)
             responses.append({"question": question, "response": response})
             
         return {

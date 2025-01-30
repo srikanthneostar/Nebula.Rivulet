@@ -10,13 +10,13 @@ class JournalEventQuestions(PipelineStage):
         host_address = [config for config in configs if config.key == "HOST"][0].value
         model_name = [config for config in configs if config.key == "MODEL"][0].value
         self.ollamaService = OllamaService(model_name,host_address)
-        self.logger = get_fabric_logger(__name__)
+        self.logger = get_fabric_logger(__name__, "C:/Temp/test.log")
 
     def process(self, data: any) -> any:
         questions = []
         for event in data:
-            prompt = f"Please generate 3 random questions for the following event: "+ str(event)
+            prompt = "Please generate 3 random questions for the following event: {}".format(str(event))
             question = self.ollamaService.ollama_client.generate(model=self.ollamaService.model_name,prompt=prompt)
             questions.append({**event, "similarQuestion": question})
-        self.logger.info("Questions",questions)
+        self.logger.info("Questions: %s", str(questions))
         return questions
