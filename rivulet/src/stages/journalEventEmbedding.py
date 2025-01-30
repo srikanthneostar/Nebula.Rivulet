@@ -10,7 +10,7 @@ class JournalEventEmbedding(PipelineStage):
         configs = appConfigProvider.get_config_by_category("CHROMADB")
         model = [config for config in configs if config.key == "CHROMA_MODEL"][0].value
         self.chromaService = ChromaService(model, "journalevents")
-        self.logger = get_fabric_logger(__name__, "C:/Temp/test.log")
+        self.logger = get_fabric_logger(__name__)
         
     def process(self, data: any) -> any:
         for events in data:

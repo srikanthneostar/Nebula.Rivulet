@@ -9,7 +9,7 @@ class JournalEventSummary(PipelineStage):
         host_address = [config for config in configs if config.key == "HOST"][0].value
         model_name = [config for config in configs if config.key == "MODEL"][0].value
         self.ollamaService = OllamaService(model_name,host_address)
-        self.logger = get_fabric_logger(__name__, "C:/Temp/test.log")
+        self.logger = get_fabric_logger(__name__)
 
     def process(self, data: any) -> any:
         self.logger.info("Journal Event Summary: %s", data)

@@ -7,7 +7,7 @@ from typing import List, Dict, Any, Generic, TypeVar
 class JournalEventsSource(DataSource):
     def __init__(self):
         self.search_service = SearchService()
-        self.logger = get_fabric_logger(__name__, "C:/Temp/test.log")
+        self.logger = get_fabric_logger(__name__)
 
     def get_data(self, query: any) -> List[Dict]:
         """
