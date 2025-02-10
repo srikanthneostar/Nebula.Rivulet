@@ -1,12 +1,9 @@
-import os
-from pathlib import Path
-from langchain.schema import Document
 from embedings.chromaService import ChromaService
-from framework.pipeline_stage import PipelineStage
-from configuration.appConfigProvider import AppConfigProvider
 from logs.logs import get_fabric_logger
+from configuration.appConfigProvider import AppConfigProvider
+import os
 
-class JournalEventEmbedding(PipelineStage):
+class ChromaSearch:
     def __init__(self):
         appConfigProvider = AppConfigProvider()
         configs = appConfigProvider.get_config_by_category("CHROMADB")
@@ -16,11 +13,6 @@ class JournalEventEmbedding(PipelineStage):
         self.chromaService = ChromaService(model, collection_name="journalevents",db_path=db_path)
         self.logger = get_fabric_logger(__name__)
         
-    def process(self, data: any) -> any:
-        for events in data:
-            documents = [
-                Document(page_content=str(event), metadata={}) for event in events
-            ]
-            self.chromaService.add_documents(documents)
-        self.logger.info("Embedding done: %s", data)
-        return data
+    def search_results(self,query: str, k: int = 2):
+        results = self.chromaService.similaritysearch(query, k)
+        return results

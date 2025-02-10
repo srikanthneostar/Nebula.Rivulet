@@ -2,10 +2,12 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
-
 from database.elasticService import ElasticService
 
-from auth import create_access_token, verify_token
+from api.auth import create_access_token, verify_token
+from api.services.vertexChromaService import ChromaSearch
+
+
 
 class SearchQuery(BaseModel):
     query: Dict = Field(..., example={
@@ -21,6 +23,9 @@ class SearchQuery(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+class SearchRequest(BaseModel):
+    query: str
 
 
 app = FastAPI(
@@ -104,4 +109,27 @@ async def search_scroll(
         raise HTTPException(
             status_code=500,
             detail=f"Scroll search failed: {str(e)}"
+        )
+
+
+@app.post("/chroma/search", tags=["search"], response_model=List[Dict])
+async def vertex_search(
+    request: SearchRequest,
+    current_user: str = Depends(verify_token)
+) -> List[Dict]:
+    """
+    Perform a search operation using Vertex Chroma Service.
+
+    - **query**: The search query to be processed
+    """
+    try:
+        if not request.query:
+            raise HTTPException(status_code=400, detail="Query cannot be empty")
+        qry = ChromaSearch()
+        results = qry.search_results(request.query)
+        return results
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Vertex search failed: {str(e)}"
         )

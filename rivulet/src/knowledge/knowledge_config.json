@@ -1,12 +1,26 @@
 [
   {
-    "name": "JournalEvents",
     "query": {
-      "match_all": {}
+      "bool": {
+        "must": [
+          {
+            "match": {
+              "entityId": 60
+            }
+          },
+          {
+            "range": {
+              "entity.ID": {
+                "gt": 10
+              }
+            }
+          }
+        ]
+      }
     },
     "questions": [
-      "give me the journal events for event type errors"
+      "Give me all the details of events with NAME Local Grant"
     ],
-    "prompt" : "You are an intelligent assistant trained to generate meaningful and context-aware questions and generate 3 random questions"
+    "prompt": "You are an intelligent assistant trained to generate meaningful and context-aware questions and generate 3 random questions"
   }
 ]

@@ -8,14 +8,15 @@ class JournalEventsSource(DataSource):
     def __init__(self):
         self.search_service = SearchService()
         self.logger = get_fabric_logger(__name__)
+        
 
-    def get_data(self, query: any) -> List[Dict]:
+    def get_data(self, query: any, page_size = 10) -> List[Dict]:
         """
         Fetch journal events data using the provided query
         """
         results = self.search_service.elastic_service.search(
-            "nebulastore", query, 10)
-        self.logger.info("result print", query)
+            "nebulastore", query, page_size)
+        self.logger.info("result print %s", query)
         self.logger.info("results")
         self.logger.info(results)
         return results
