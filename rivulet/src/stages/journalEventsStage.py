@@ -18,7 +18,7 @@ class JournalEventsQAstage(PipelineStage):
         for question in questions:
             response = self.ollamaService.query_model(prompt=prompt,query=question, data=data)
             responses.append({"question": question, "response": response})
-            
+
         return {
             "data" : data,
             "response" : responses

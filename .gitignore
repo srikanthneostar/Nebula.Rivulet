@@ -24,3 +24,6 @@ rivulet/src/tests/journal_events_qa_stage.log
 rivulet/src/tests/journal_events_questions.log
 rivulet/src/tests/journal_events_source.log
 rivulet/src/tests/nebula_db
+vertex/src/api/__pycache__
+vertex/src/api/services/__pycache__
+vertex/src/api/app.log

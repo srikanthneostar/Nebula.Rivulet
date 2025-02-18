@@ -1,6 +1,7 @@
 from abc import ABC
 import os
 import chromadb
+from chromadb.config import Settings
 from langchain_chroma import Chroma
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from typing import List
@@ -11,25 +12,40 @@ class ChromaService(ABC):
     def __init__(self, model_name: str, collection_name: str, db_path: str = "./nebula_db"):
         self.sentence_Transformer = SentenceTransformerEmbeddings(model_name=model_name)
         self.db_path = db_path
-        self.chroma_Db = chromadb.PersistentClient(path=self.db_path)
-        self.collection = self.chroma_Db.get_or_create_collection(
-            name=collection_name
-        )
-        self.langchain_chroma_db = Chroma(
-            client=self.chroma_Db,
-            collection_name=collection_name,
+        self.collection_name = collection_name
+
+        # Ensure ChromaDB is initialized with persistence
+        self.chroma_db = Chroma(
+            persist_directory=self.db_path,  # Ensure persistence is enabled
             embedding_function=self.sentence_Transformer,
-        )
-    def add_documents(self, documents: List[Document], ids=None, persist_path: str = None) -> Chroma:
-        return self.langchain_chroma_db.from_documents(
-            documents=documents,
-            embedding=self.sentence_Transformer,
-            ids=ids,
-            persist_directory=persist_path,
+            client=chromadb.PersistentClient(
+                path=self.db_path,
+                settings=Settings(
+                    anonymized_telemetry=False
+                ))
         )
 
-    def similarity_search(self, query: str, k: int = 2) -> List[Document]:
-            return self.langchain_chroma_db.similarity_search(
-                query=query,
-                k=k
-            )
+    def add_documents(self, documents: List[Document]) -> None:
+        if os.path.exists(self.db_path):
+            print(f"Appending to existing vectorstore at {self.db_path}")
+            # self.chroma_db.get()
+            self.chroma_db.add_documents(documents)
+        else:
+            print("Creating new vectorstore")
+            print(f"Creating embeddings. May take some minutes...")
+
+            self.chroma_db = Chroma.from_documents(
+                documents=documents,
+                embedding_function=self.sentence_Transformer,
+                persist_directory=self.db_path,
+                collection_name=self.collection_name,
+                client=chromadb.PersistentClient(
+                    path=self.db_path,
+                    settings=Settings(
+                        anonymized_telemetry=False
+                    ))
+                )
+        # self.chroma_db.persist()
+
+    def similarity_search(self, query: str, k: int = 10) -> List[Document]:
+        return self.chroma_db.similarity_search(query=query, k=k,)

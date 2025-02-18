@@ -3,10 +3,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
 from database.elasticService import ElasticService
-
-from api.auth import create_access_token, verify_token
-from api.services.vertexChromaService import ChromaSearch
-
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware import Middleware
+from auth import create_access_token, verify_token
+from services.vertexChromaService import ChromaSearch
+from services.vertexFaissService import FaissSearch
 
 
 class SearchQuery(BaseModel):
@@ -26,9 +27,14 @@ class TokenResponse(BaseModel):
 
 class SearchRequest(BaseModel):
     query: str
+    k : int
+    llmsearch : bool
 
 
 app = FastAPI(
+    middleware=[
+        Middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+    ],
     title="Elasticsearch Search API",
     description="API for performing authenticated Elasticsearch searches",
     version="1.0.0",
@@ -41,10 +47,11 @@ app = FastAPI(
     }]
 )
 
+
 es_service = ElasticService(['http://localhost:9200'])
 
 
-@app.post("/token", response_model=TokenResponse, tags=["authentication"])
+@app.post("/login", response_model=TokenResponse, tags=["authentication"])
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     Get access token for API authentication.
@@ -115,6 +122,7 @@ async def search_scroll(
 @app.post("/chroma/search", tags=["search"], response_model=List[Dict])
 async def vertex_search(
     request: SearchRequest,
+    
     current_user: str = Depends(verify_token)
 ) -> List[Dict]:
     """
@@ -126,10 +134,40 @@ async def vertex_search(
         if not request.query:
             raise HTTPException(status_code=400, detail="Query cannot be empty")
         qry = ChromaSearch()
-        results = qry.search_results(request.query)
-        return results
+        results = qry.search_results(request.query, request.k, request.llmsearch)
+        serialized_results = [
+            result if isinstance(result, dict) else result.__dict__ for result in results
+        ]
+        return serialized_results
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Vertex search failed: {str(e)}"
+            detail=f"Chroma search failed: {str(e)}"
         )
+
+
+@app.post("/faiss/search", tags=["search"])
+async def faiss_search(
+    request: SearchRequest,
+    current_user: str = Depends(verify_token)
+) -> List[Dict]:
+    """
+    Perform a search operation using FAISS.
+    - **query**: The search query to be processed
+    """
+    try:
+        if not request.query:
+            raise HTTPException(status_code=400, detail="Query cannot be empty")
+        qry = FaissSearch()
+        results = qry.search_results(request.query)
+        serialized_results = [
+            result if isinstance(result, dict) else result.__dict__ for result in results
+        ]
+        return serialized_results
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"FAISS search failed: {str(e)}"
+        )
+    

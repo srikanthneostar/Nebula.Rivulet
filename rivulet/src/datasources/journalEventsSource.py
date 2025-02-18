@@ -10,7 +10,7 @@ class JournalEventsSource(DataSource):
         self.logger = get_fabric_logger(__name__)
         
 
-    def get_data(self, query: any, page_size = 10) -> List[Dict]:
+    def get_data(self, query: any, page_size =10) -> List[Dict]:
         """
         Fetch journal events data using the provided query
         """

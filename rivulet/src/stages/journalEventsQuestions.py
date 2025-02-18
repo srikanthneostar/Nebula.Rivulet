@@ -17,6 +17,7 @@ class JournalEventQuestions(PipelineStage):
         for event in data:
             prompt = "Please generate 3 random questions for the following event: {}".format(str(event))
             question = self.ollamaService.ollama_client.generate(model=self.ollamaService.model_name,prompt=prompt)
-            questions.append({**event, "similarQuestion": question})
-        self.logger.info("Questions: %s", str(questions))
+            sample =  question.response
+            questions.append({**event, "similarQuestion": question.response})
+        self.logger.info("Questions \n: %s", str(questions))
         return questions
