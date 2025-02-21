@@ -8,7 +8,7 @@ from fastapi.middleware import Middleware
 from auth import create_access_token, verify_token
 from services.vertexChromaService import ChromaSearch
 from services.vertexFaissService import FaissSearch
-
+from services.vertexOllamaSearch import OllamaSearch
 
 class SearchQuery(BaseModel):
     query: Dict = Field(..., example={
@@ -30,6 +30,13 @@ class SearchRequest(BaseModel):
     k : int
     llmsearch : bool
 
+class ContextRequest(BaseModel):
+    entityid: int
+    ids : List[int]
+
+class SearchResponse(BaseModel):
+    guid : str
+    query : str
 
 app = FastAPI(
     middleware=[
@@ -171,3 +178,40 @@ async def faiss_search(
             detail=f"FAISS search failed: {str(e)}"
         )
     
+
+@app.post("/context/search", tags=["search"])
+async def context_search(
+    request: ContextRequest,
+    current_user: str = Depends(verify_token)
+    ) -> List[Dict]:
+    try:
+        if not request.entityid:
+            raise HTTPException(status_code=400, detail="Entity ID cannot be empty")
+        qry = OllamaSearch()
+        results = qry.search_ElasticSearch(request.entityid,request.ids)
+        return results
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Context search failed: {str(e)}"
+        )
+
+
+@app.post("/llm/search", tags=["search"])
+async def llm_search(
+    request: SearchResponse,
+    current_user: str = Depends(verify_token)
+):
+    try:
+        if not request.query:
+            raise HTTPException(status_code=400, detail="Query cannot be empty")
+        qry = OllamaSearch()
+        results = qry.search_Ollama(request.guid,request.query)
+        # json_results = json.dumps(results)
+        # parsed_results = json.loads(json_results)
+        return results
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Search failed: {str(e)}"
+        )

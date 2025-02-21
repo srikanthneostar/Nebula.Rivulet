@@ -24,6 +24,7 @@ class ChromaSearch:
     
     def search_results(self, query: str, k: int = 10, llmsearch : bool = False):
         results = self.chromaService.similarity_search(query, k)
+        self.logger.info(results)
         if llmsearch == True:
             service = self.get_OllamaService()
             model_name = str(service[1])

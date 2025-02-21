@@ -15,11 +15,10 @@ class JournalEventEmbedding(PipelineStage):
         configs = appConfigProvider.get_config_by_category("CHROMADB")
         model = [config for config in configs if config.key == "CHROMA_MODEL"][0].value
         nebula_home = os.getenv("NEBULA_HOME")
-        self.db_path = os.path.join(nebula_home, "nebula_db")
+        db_path = str(os.path.join(nebula_home, "nebula_db"))
         # self.faissService = FaissService(model, collection_name="journalevents", db_path=self.db_path)
-        self.chromaService = ChromaService(model, collection_name="journalevents", db_path=self.db_path)
-        self.logger = get_fabric_logger(__name__)
-        
+        self.chromaService = ChromaService(model, collection_name="journalevents",db_path=db_path)
+        self.logger = get_fabric_logger(__name__)        
     def process(self, data: any) -> any:
         documents = []
         for event in data:
@@ -32,5 +31,5 @@ class JournalEventEmbedding(PipelineStage):
         self.chromaService.add_documents(
             documents=documents
         )
-        self.logger.info(f"Embedded and stored {len(documents)} documents to {self.db_path}")
+        self.logger.info(f"Embedded and stored {len(documents)} documents")
         return data
