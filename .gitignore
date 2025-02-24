@@ -27,3 +27,4 @@ rivulet/src/tests/nebula_db
 vertex/src/api/__pycache__
 vertex/src/api/services/__pycache__
 vertex/src/api/app.log
+/.venv/*
