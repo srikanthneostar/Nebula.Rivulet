@@ -1,10 +1,8 @@
 import json
 import os
-from pathlib import Path
 from langchain.schema import Document
 # from embedings.faissService import FaissService
 from embedings.chromaService import  ChromaService
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from framework.pipeline_stage import PipelineStage
 from configuration.appConfigProvider import AppConfigProvider
 from logs.logs import get_fabric_logger
@@ -19,6 +17,7 @@ class JournalEventEmbedding(PipelineStage):
         # self.faissService = FaissService(model, collection_name="journalevents", db_path=self.db_path)
         self.chromaService = ChromaService(model, collection_name="journalevents",db_path=db_path)
         self.logger = get_fabric_logger(__name__)        
+
     def process(self, data: any) -> any:
         documents = []
         for event in data:
@@ -26,10 +25,12 @@ class JournalEventEmbedding(PipelineStage):
                 page_content=json.dumps(event)
             )
             documents.append(doc)
-
+        entityid = [event.get('entity', {}).get('ID') for event in data]
+        
         self.logger.info(f"Embedding documents \n: {documents}")
         self.chromaService.add_documents(
-            documents=documents
+            documents=documents,
+            entityid=entityid
         )
         self.logger.info(f"Embedded and stored {len(documents)} documents")
         return data

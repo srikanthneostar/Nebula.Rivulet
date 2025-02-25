@@ -153,6 +153,28 @@ async def vertex_search(
         )
 
 
+@app.post("/delete/id", tags=["search"])
+async def delete_by_id(
+    req_info : dict,
+    current_user: str = Depends(verify_token)
+) -> List[Dict]:
+    """ 
+    Delete a document by its ID.
+    - **ids**: The list of IDs to be deleted
+    """
+    try:
+        if not req_info:
+            raise HTTPException(status_code=400, detail="ID cannot be empty")
+        qry = ChromaSearch()
+        ids = req_info["ids"]
+        results = qry.delete_collection(ids)
+        return [{"message": "Given ids are deleted"}] if results is None else results
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Document deletion failed: {str(e)}"
+        )
+
 @app.post("/faiss/search", tags=["search"])
 async def faiss_search(
     request: SearchRequest,
@@ -207,8 +229,6 @@ async def llm_search(
             raise HTTPException(status_code=400, detail="Query cannot be empty")
         qry = OllamaSearch()
         results = qry.search_Ollama(request.guid,request.query)
-        # json_results = json.dumps(results)
-        # parsed_results = json.loads(json_results)
         return results
     except Exception as e:
         raise HTTPException(

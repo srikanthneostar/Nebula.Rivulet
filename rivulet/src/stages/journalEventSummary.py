@@ -2,6 +2,7 @@ from framework.pipeline_stage import PipelineStage
 from configuration.appConfigProvider import AppConfigProvider
 from llms.ollamaService import OllamaService
 from logs.logs import get_fabric_logger
+
 class JournalEventSummary(PipelineStage):
     def __init__(self):
         appConfigProvider = AppConfigProvider()

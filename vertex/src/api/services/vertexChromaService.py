@@ -33,3 +33,8 @@ class ChromaSearch:
             response = service[0].ollama_client.generate(model=model_name, prompt=prompt)
             results.append({"query_response": response.response})
         return results
+
+    def delete_collection(self, ids):
+        for id in ids:
+            self.logger.info(f"Deleting {id}")
+            self.chromaService.delete_collection(ids=str(id))
