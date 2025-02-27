@@ -1,3 +1,4 @@
+import json
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Dict, List, Optional
@@ -126,12 +127,12 @@ async def search_scroll(
         )
 
 
-@app.post("/chroma/search", tags=["search"], response_model=List[Dict])
+@app.post("/chroma/search", tags=["search"])
 async def vertex_search(
     request: SearchRequest,
     
     current_user: str = Depends(verify_token)
-) -> List[Dict]:
+):
     """
     Perform a search operation using Vertex Chroma Service.
 
@@ -142,10 +143,10 @@ async def vertex_search(
             raise HTTPException(status_code=400, detail="Query cannot be empty")
         qry = ChromaSearch()
         results = qry.search_results(request.query, request.k, request.llmsearch)
-        serialized_results = [
-            result if isinstance(result, dict) else result.__dict__ for result in results
-        ]
-        return serialized_results
+        # serialized_results = [
+        #     result if isinstance(result, dict) else result.__dict__ for result in results
+        # ]
+        return results
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -234,4 +235,40 @@ async def llm_search(
         raise HTTPException(
             status_code=500,
             detail=f"Search failed: {str(e)}"
+        )
+    
+
+
+@app.post("/knowledge/questions", tags=["search"])
+async def get_knowledge_questions(
+    request: dict,
+    current_user: str = Depends(verify_token)
+):
+    try:
+        if not request.get("config_path"):
+            raise HTTPException(status_code=400, detail="Config path cannot be empty")
+        
+        with open(request["config_path"], 'r') as f:
+            config = json.load(f)
+        
+
+        if "questions" not in config[1]:
+            raise HTTPException(status_code=404, detail="No questions found in config file")
+            
+        return config[1]["questions"]
+        
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Config file not found"
+        )
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid JSON format in config file"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get questions: {str(e)}"
         )
