@@ -1,4 +1,5 @@
 import json
+import os
 from framework.pipeline_stage import PipelineStage
 from configuration.appConfigProvider import AppConfigProvider
 from llms.ollamaService import OllamaService
@@ -31,7 +32,12 @@ class JournalEventQuestions(PipelineStage):
             for ques in cleaned_questions:
                 print(f"{ques}")
             
-            config_path = "C:/nebula.rivulet/rivulet/src/knowledge/knowledge_config.json"
+            root_path = os.path.dirname(os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__))))
+            
+            root_path = root_path.replace("\\rivulet", "\\rivulet\\src\\knowledge")
+            config_path = os.path.join(root_path, "knowledge_config.json")
+            
             with open(config_path, 'r') as f:
                 config = json.load(f)
 
