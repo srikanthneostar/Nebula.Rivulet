@@ -10,6 +10,8 @@ from auth import create_access_token, verify_token
 from services.vertexChromaService import ChromaSearch
 from services.vertexFaissService import FaissSearch
 from services.vertexOllamaSearch import OllamaSearch
+import os
+
 
 class SearchQuery(BaseModel):
     query: Dict = Field(..., example={
@@ -19,29 +21,35 @@ class SearchQuery(BaseModel):
             }
         }
     })
-    size: Optional[int] = Field(1000, description="Number of results to return")
+    size: Optional[int] = Field(
+        1000, description="Number of results to return")
 
 
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
+
 class SearchRequest(BaseModel):
     query: str
-    k : int
-    llmsearch : bool
+    k: int
+    llmsearch: bool
+
 
 class ContextRequest(BaseModel):
     entityid: int
-    ids : List[int]
+    ids: List[int]
+
 
 class SearchResponse(BaseModel):
-    guid : str
-    query : str
+    guid: str
+    query: str
+
 
 app = FastAPI(
     middleware=[
-        Middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+        Middleware(CORSMiddleware, allow_origins=[
+                   "*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
     ],
     title="Elasticsearch Search API",
     description="API for performing authenticated Elasticsearch searches",
@@ -89,7 +97,8 @@ async def search(
     - **search_query**: The search query in Elasticsearch DSL format
     """
     try:
-        results = es_service.search(index, search_query.query, search_query.size)
+        results = es_service.search(
+            index, search_query.query, search_query.size)
         return results
     except Exception as e:
         raise HTTPException(
@@ -130,7 +139,7 @@ async def search_scroll(
 @app.post("/chroma/search", tags=["search"])
 async def vertex_search(
     request: SearchRequest,
-    
+
     current_user: str = Depends(verify_token)
 ):
     """
@@ -140,9 +149,11 @@ async def vertex_search(
     """
     try:
         if not request.query:
-            raise HTTPException(status_code=400, detail="Query cannot be empty")
+            raise HTTPException(
+                status_code=400, detail="Query cannot be empty")
         qry = ChromaSearch()
-        results = qry.search_results(request.query, request.k, request.llmsearch)
+        results = qry.search_results(
+            request.query, request.k, request.llmsearch)
         # serialized_results = [
         #     result if isinstance(result, dict) else result.__dict__ for result in results
         # ]
@@ -156,7 +167,7 @@ async def vertex_search(
 
 @app.post("/delete/id", tags=["search"])
 async def delete_by_id(
-    req_info : dict,
+    req_info: dict,
     current_user: str = Depends(verify_token)
 ) -> List[Dict]:
     """ 
@@ -176,6 +187,7 @@ async def delete_by_id(
             detail=f"Document deletion failed: {str(e)}"
         )
 
+
 @app.post("/faiss/search", tags=["search"])
 async def faiss_search(
     request: SearchRequest,
@@ -187,7 +199,8 @@ async def faiss_search(
     """
     try:
         if not request.query:
-            raise HTTPException(status_code=400, detail="Query cannot be empty")
+            raise HTTPException(
+                status_code=400, detail="Query cannot be empty")
         qry = FaissSearch()
         results = qry.search_results(request.query)
         serialized_results = [
@@ -200,18 +213,19 @@ async def faiss_search(
             status_code=500,
             detail=f"FAISS search failed: {str(e)}"
         )
-    
+
 
 @app.post("/context/search", tags=["search"])
 async def context_search(
     request: ContextRequest,
     current_user: str = Depends(verify_token)
-    ) -> List[Dict]:
+) -> List[Dict]:
     try:
         if not request.entityid:
-            raise HTTPException(status_code=400, detail="Entity ID cannot be empty")
+            raise HTTPException(
+                status_code=400, detail="Entity ID cannot be empty")
         qry = OllamaSearch()
-        results = qry.search_ElasticSearch(request.entityid,request.ids)
+        results = qry.search_ElasticSearch(request.entityid, request.ids)
         return results
     except Exception as e:
         raise HTTPException(
@@ -227,16 +241,16 @@ async def llm_search(
 ):
     try:
         if not request.query:
-            raise HTTPException(status_code=400, detail="Query cannot be empty")
+            raise HTTPException(
+                status_code=400, detail="Query cannot be empty")
         qry = OllamaSearch()
-        results = qry.search_Ollama(request.guid,request.query)
+        results = qry.search_Ollama(request.guid, request.query)
         return results
     except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=f"Search failed: {str(e)}"
         )
-    
 
 
 @app.post("/knowledge/questions", tags=["search"])
@@ -246,17 +260,23 @@ async def get_knowledge_questions(
 ):
     try:
         if not request.get("config_path"):
-            raise HTTPException(status_code=400, detail="Config path cannot be empty")
-        
-        with open(request["config_path"], 'r') as f:
+            raise HTTPException(
+                status_code=400, detail="Config path cannot be empty")
+        root_path = os.path.dirname(os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__)))).replace("/vertex", "/rivulet/src/knowledge")
+
+        config_file_path = os.path.join(
+            root_path, request["config_path"].replace(".json", "")+".json")
+
+        with open(config_file_path, 'r') as f:
             config = json.load(f)
-        
 
         if "questions" not in config[1]:
-            raise HTTPException(status_code=404, detail="No questions found in config file")
-            
+            raise HTTPException(
+                status_code=404, detail="No questions found in config file")
+
         return config[1]["questions"]
-        
+
     except FileNotFoundError:
         raise HTTPException(
             status_code=404,
