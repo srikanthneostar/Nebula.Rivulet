@@ -1,40 +1,100 @@
 [
-  {
-    "page_size" : 10,
-    "index" : "nebulastore"
-  },
-  {
-    "sort": [
     {
-      "entity.ID": {
-        "order": "asc"
-      }
-    }
-    ],
-    "query": {
-      "bool": {
-        "must": [
-          {
-            "match": {
-              "entityId": 60
-            }
-          },
-          {
-            "range": {
-              "entity.ID": {
-                "gt": 10
-              }
-            }
-          }
-        ]
-      }
+        "page_size": 10,
+        "index": "nebulastore"
     },
-    "questions": [
-      "Give me all the details of events with NAME Local Grant"
-    ],
-    "prompt": "You are an intelligent assistant trained to generate meaningful and context-aware questions and generate 3 random questions"
-  },
-  {
-    "ollama_prompt" : "You are a helpful assistant. Your task is to answer questions only based on the provided context. If the question cannot be answered using the information in the context, you must respond with: 'I cannot answer this question based on the available context.' Do not make up or guess answers."
-  }
+    {
+        "sort": [
+            {
+                "entity.ID": {
+                    "order": "asc"
+                }
+            }
+        ],
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "match": {
+                            "entityId": 60
+                        }
+                    },
+                    {
+                        "range": {
+                            "entity.ID": {
+                                "gt": 10
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "questions": [
+            "Give me all the details of events with NAME Local Grant",
+            "What is the specific model name of the card reader used by Navinder Gill at location ID 831 for Local Grant?",
+            "On what date was the L91 Goods Lift Card Reader last modified, and who had access to this information according to 'ISNOTIFIED' field status (0 implies everyone has access)?",
+            "What is the unique device identifier associated with Navinder Gill\u2019s use of the card reader for Local Grant?",
+            "What is the unique identifier for Stella Patsouras's entry at Local Grant?",
+            "What were the specifics of Stella Patsouras's financial activity or property access at Local Grant on January 23rd?",
+            "On what date and time did Stella Patsouras record her entry, based on the electronic timestamp?",
+            "On what date and time did Shruthisri Nyalam utilize the D22 Low Rise Lift 2 Card Reader for elevator access?",
+            "What is the unique identifier (ID) of the card reader used by individual named in summary on January 23, 2025?",
+            "Which type of credit/debit card was issued to Shruthisri Nyalam's account for this transaction recorded at location 833?",
+            "On what specific dates was Saravanan Sakthivelu's visit to Highrise East Lobby recorded?",
+            "What card number did Saravanan use for his journal entry, and where can this information be verified within the context provided?",
+            "Can you infer any potential reason or activity linked with the absence of dates related to other journal entries (JOURNALDATE1-5) in the record?",
+            "What device recorded the event involving Local Grant at location 829?",
+            "Who is associated with CARDNUMBER matching ID 43461 from this context, and what was their first name spelled out by each letter's corresponding alphabetical position (A=1, B=2, etc.) summed up to get a total value at the time of recording?",
+            "On which date did Local Grant interact with an elevator card reader as per the summary provided in this context?",
+            "Considering the date of the transaction for Local Grant purchase mentioned in summary as \"January 23, 2025,\" and with a follow-up event on February 5, 2025, what could be inferred about E.'s potential wait time or processing duration after obtaining the grant?",
+            "Given that 'ISNOTIFIED': 0 implies no notifications were raised during this process as per summary context and assuming standard practices in financial transactions are followed; can you speculate on which steps might have been omitted, skipped, or automatically handled to achieve such a result without manual intervention?",
+            "Based on the unique credit card number ending with '13' provided by CARDNUMBER entityId within summary context and its association with E.'s transaction for Local Grant purchase, could this indicate any specific banking policies or practices that are in effect regarding expiration dates of issued cards at local grant agencies?",
+            "What is David Kristitz's full name as documented on January 23?",
+            "Can you confirm if a 'Local Grant' event took place at Location 578 for the individual with ID 47849?",
+            "On what date was the information about David Kristitz and his card number created, according to the available data?",
+            "On what date did Daniel Drake's Local Grant record an event in January 2025?",
+            "What is the card number associated with Daniel Drake\u2019s grant application on that specific day, as recorded by Experian West Double Door Reader G67 Level 26?",
+            "Was Daniel Drake's Local Grant notified of any updates or alerts at the time it was logged in February 2025 according to its event log entries?",
+            "On what date did Tags-M Ausnet attend the \"2E1 Lvl 1 Male Showers Entry - Reader\" event?",
+            "What is the unique identifier (ID) assigned to the device involved in recording this attendance entry?",
+            "Has the record of Tags-M Ausnet's attendance at the \"2E1 Lvl 1 Male Showers Entry - Reader\" event been modified since its creation, and if not, when was it created originally?",
+            "What was purchased by Soizig McIntosh at Location 780 with ID number 47852 and DeviceID 397?",
+            "On what date did Soizig McIntosh complete this transaction for the Aqua Tech Tenancy Door Reader, as indicated in the provided summary context?",
+            "Which card was used by Soizig McIntosh to purchase an Aqua Tech Tenancy Door Reader on January 23, and what is its associated number from the given entity data?",
+            "What event took place involving \"David Lim\" using a specific tenancy access device?",
+            "On what date and time did \"David Lim\" use his Local Grant to interact with the H21 Lvl 27 Heinz West Tenancy Door Reader, according to our records from January 23, 2025?",
+            "Could you list David Lim's personal details such as first name, last name, and card number based on your database extract for this event?",
+            "What is the name of the entity associated with ID#47854?",
+            "On what date and at which location did individual F Tags-F Ausnet enter using card number 42639, as recorded on February 5, 2025?",
+            "Can you confirm if a notification was issued for the entry of tags-f Ausnet in this event based on the information provided?",
+            "What is the significance of the 'JOURNALINT1' field in relation to FPGA\u2019s activity?",
+            "How many journal text fields were filled for this particular record and which one contains any additional information not found in others?",
+            "When was both the event date recorded and the document modification dates synchronized with, based on given data?",
+            "What was the specific location where Local Grant accessed the L52 High Rise Elevator Reader?",
+            "On what date and at which time did Local Grant use his card to access the elevator reader in January 2025?",
+            "Which journal text field entry corresponds with Local Grant's action of accessing the elevator, according to the provided context summary?",
+            "What is the full name of Margaret who made the payment?",
+            "When did she make her latest known financial entry through this device and what was it for?",
+            "Can you specify which part of 'EVENTINT' reflects a numerical value in Margaret Alefaio's transaction record at Local Grant on January 23, 2025?",
+            "What is the ID of Thomas Aberastury's local grant event?",
+            "On what date was this male shower event recorded by John Smith at Location 48793?",
+            "Which card number corresponds to an entry for a female water fountain experience on April 15, 2025, located at Point 560?",
+            "What is the name of the individual who performed the 'Local Grant' sliding event in West Office Area Reader on January 23, 2025?",
+            "Which card number was used during Margaret Alefaio\u2019s transaction at location 753 on that day?",
+            "What type of device did Margaret Alefaio use to make the sliding event with ID #47859 and Device ID #907 in West Office Area Reader?",
+            "What is the name of the entity that recorded access on January 23, 2025?",
+            "Which device ID corresponds to the D11 Low Rise Lift 1 Card Reader system in this context?",
+            "Who was Mat Lorencak and what did he enter into the journal text fields during his entry time?",
+            "On what date did Andrew Kolesnikov use his card at Local Grant's entry door?",
+            "What was the device ID assigned to Local Grant's reader when Andrew accessed it with his card on January 23, 2025?",
+            "Was there any additional journal text or information provided regarding Andrew Kolesnikov\u2019s interaction at location 643 and date mentioned in the summary? If not, what specific details are missing from the context given about this event?",
+            "On what date and during which event was the card numbered as CARD#43442 issued to individual M Tags-Ausnet?",
+            "What is the name of the device associated with EventID #0x006F870B205648E142078B65A325EE7DF9E7 and how was it accessed by Ausnet on January 23, 2025?",
+            "Can you provide more details about the access event involving individual M Tags-Ausnet to Local Grant ID #47862 at Location 830 on January 23, 2025?"
+        ],
+        "prompt": "You are an intelligent assistant trained to generate meaningful and context-aware questions and generate 3 random questions"
+    },
+    {
+        "ollama_prompt": "You are a helpful assistant. Your task is to answer questions only based on the provided context. If the question cannot be answered using the information in the context, you must respond with: 'I cannot answer this question based on the available context.'"
+    }
 ]

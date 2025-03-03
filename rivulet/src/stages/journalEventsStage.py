@@ -1,6 +1,7 @@
 from framework.pipeline_stage import PipelineStage
 from configuration.appConfigProvider import AppConfigProvider
 from llms.ollamaService import OllamaService
+from logs.logs import get_fabric_logger
 
 class JournalEventsQAstage(PipelineStage):
     def __init__(self,config:any):
@@ -10,6 +11,7 @@ class JournalEventsQAstage(PipelineStage):
         host_address = [config for config in configs if config.key == "HOST"][0].value
         model_name = [config for config in configs if config.key == "MODEL"][0].value
         self.ollamaService = OllamaService(model_name,host_address)
+        self.logger = get_fabric_logger(__name__)
 
     def process(self, data: any) -> any:
         questions = self.Configuraiton["questions"]
@@ -18,7 +20,7 @@ class JournalEventsQAstage(PipelineStage):
         for question in questions:
             response = self.ollamaService.query_model(prompt=prompt,query=question, data=data)
             responses.append({"question": question, "response": response})
-
+            self.logger.info("Response \n: %s", response)
         return {
             "data" : data,
             "response" : responses
