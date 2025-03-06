@@ -1,5 +1,5 @@
 from typing import List, Dict, Any
-from chat_source import ChatMessageHistory
+from chat_history.chat_source import ChatMessageHistory
 from configuration.appConfigProvider import AppConfigProvider
 from langchain_community.chat_message_histories.elasticsearch import ElasticsearchChatMessageHistory
 

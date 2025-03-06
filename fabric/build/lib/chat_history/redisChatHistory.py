@@ -1,7 +1,7 @@
 import json
 from typing import List, Dict, Any
 from configuration.appConfigProvider import AppConfigProvider
-from chat_source import ChatMessageHistory
+from chat_history.chat_source import ChatMessageHistory
 from langchain_community.chat_message_histories.redis import RedisChatMessageHistory
 
 class RedisChatHistory(ChatMessageHistory):
