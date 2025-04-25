@@ -1,3 +1,4 @@
+# core.py
 import pandas as pd
 import numpy as np
 import xgboost as xgb
@@ -7,26 +8,69 @@ from database.sqlService import SqlConnector
 sql = SqlConnector()
 
 class Forecasting:
-    def __init__(self, query : str, parameters, future_days : None = 30):
-        self.df = self.load_and_prepare_data(query, parameters)
+    def __init__(self, queryid: int, future_days=30):
+        self.queryid = queryid
         self.forecast_days = future_days
 
-    def load_and_prepare_data(self,query,parameters):
+    def get_application_query(self):
+        """Get query text safely using parameterized SQL"""
         try:
-            df = sql.execute_Sql(query,parameters)
-            if "date" not in df.columns or "value" not in df.columns:
-                print("Missing Date or Value column!")
-                return None
-            elif not pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors='coerce').notna().all():
-                print("Date format is incorrect!, It should be in YYYY-MM-DD HH:MM:SS format")
-                return None
-            df["date"] = pd.to_datetime(df["date"])
-            df = df.drop_duplicates(subset="date").sort_values("date").reset_index(drop=True)
-            df = df.set_index("date").asfreq("D").reset_index()
-            # print(df.head(5))
-            return df
+            qry = "SELECT QUERY FROM APPLICATIONQUERIES WHERE ID = ?"  # Parameter placeholder
+            results = sql.execute_Sql(qry, (self.queryid,))  # Pass as tuple
+            
+            if results.empty:  # Replace "if not results"
+                raise ValueError(f"No query found with ID {self.queryid}")
+                
+            # Handle different result types
+            if isinstance(results, pd.DataFrame):
+                return results.iloc[0]['QUERY']
+            elif isinstance(results, list) and len(results) > 0:
+                return results[0]['QUERY']
+            else:
+                raise ValueError("Unexpected result format from database")
+                
         except Exception as e:
-            print(f"Error loading data from SQL: {e}")
+            print(f"Database error: {str(e)}")
+            raise
+
+    def load_and_prepare_data(self, query):
+        """Load data with enhanced validation"""
+        try:
+            df = sql.execute_Sql(query)
+            
+            # Check for empty results
+            if df is None:
+                return None
+            if len(df) < 10:  # Now safe to check length
+                print("Insufficient data rows")
+                return None
+                            
+            # Validate required columns
+            required_cols = {"date", "value"}
+            if not required_cols.issubset(df.columns):
+                missing = required_cols - set(df.columns)
+                print(f"Missing columns: {missing}")
+                return None
+                
+            # Validate date format
+            df["date"] = pd.to_datetime(df["date"], errors='coerce')
+            if df["date"].isnull().any():
+                print("Invalid date format (YYYY-MM-DD required)")
+                return None
+                
+            # Process data
+            df = (
+                df.drop_duplicates("date")
+                .sort_values("date")
+                .set_index("date")
+                .asfreq("D")
+                .reset_index()
+            )
+            
+            return df.dropna(subset=["value"])
+            
+        except Exception as e:
+            print(f"Data loading error: {str(e)}")
             return None
 
     def feature_engineering(self,df):
@@ -78,28 +122,33 @@ class Forecasting:
             "forecast": forecasts
         })
 
-    def  get_forecast(self):
-        df = self.load_and_prepare_data()
-        if df is None or df.shape[0] < 10:
-            return None
-        
-        df = self.feature_engineering(df)
-        feature_cols = [col for col in df.columns if col not in ["date", "value"]]
-        X, y = df[feature_cols], df["value"]
-        model = self.train_model(X, y)
-
-        last_values = df["value"].values[-7:].tolist()
-        base_date = df["date"].max()
-        future_df = self.forecast_future(model, last_values, base_date, self.forecast_days, feature_cols)
-
-        return {
-            "historical": df[["date", "value"]].to_dict(orient="records"),
-            "forecast": future_df.to_dict(orient="records")
-        }
-
-# if __name__ == "__main__":
-#     query = """ """
-#     forecast = Forecasting(query)
-    
-#     response = forecast.get_forecast()
-#     print(response)
+    def get_forecast(self):
+        """Main forecasting process with validation"""
+        try:
+            query = self.get_application_query()
+            df = self.load_and_prepare_data(query)
+            
+            if df is None:
+                return {"error": "Data loading failed"}
+            if len(df) < 10:
+                return {"error": "Need at least 10 days of historical data"}
+                
+            # Feature engineering and modeling
+            df = self.feature_engineering(df)
+            feature_cols = [col for col in df.columns if col not in ["date", "value"]]
+            
+            model = self.train_model(df[feature_cols], df["value"])
+            last_values = df["value"].tail(7).tolist()
+            base_date = df["date"].max()
+            
+            forecast = self.forecast_future(
+                model, last_values, base_date, self.forecast_days, feature_cols
+            )
+            
+            return {
+                "historical": df[["date", "value"]].assign(date=lambda x: x["date"].dt.strftime('%Y-%m-%d'))
+                .to_dict(orient="records"),
+                "forecast": forecast.to_dict(orient="records")
+            }
+        except Exception as e:
+            return {"error": str(e)}
