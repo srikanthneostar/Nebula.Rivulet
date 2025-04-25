@@ -1,22 +1,20 @@
-from asyncio import Lock
-from threading import RLock
 import json
-import concurrent.futures
-import uuid
-from fastapi import FastAPI, Depends, HTTPException, APIRouter
+from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
 from database.elasticService import ElasticService
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware import Middleware
-import socketio
-from .auth import create_access_token, verify_token
-from .services.vertexChromaService import ChromaSearch
-from .services.vertexFaissService import FaissSearch
-from .services.vertexOllamaSearch import OllamaSearch
-from .services.vertexMLService import run_anomaly_task, emit_status, run_forecast_task
+from auth import create_access_token, verify_token
+from services.vertexChromaService import ChromaSearch
+from services.vertexFaissService import FaissSearch
+from services.vertexOllamaSearch import OllamaSearch
 import os
+from fastapi import BackgroundTasks
+from app import celery, get_api_task_status
+
 
 app = FastAPI(
     middleware=[
@@ -34,15 +32,6 @@ app = FastAPI(
         "description": "Search operations"
     }]
 )
-
-router = APIRouter()
-
-sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*')
-socket_app = socketio.ASGIApp(sio, app)
-
-active_tasks = {}
-task_lock = RLock()
-executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)
 
 
 class SearchQuery(BaseModel):
@@ -78,16 +67,6 @@ class SearchResponse(BaseModel):
     guid: str
     query: str
     session_id : str = None
-
-class DetectionRequest(BaseModel):
-    query: str
-    parameters: dict = None
-
-class ForecastRequest(BaseModel):
-    query: str
-    parameters: dict = None
-    future_days: int = 30
-
 
 
 
@@ -340,117 +319,16 @@ async def get_session_chat_history(
         )
 
 
-@router.post("/anomaly/streaming/start")
-async def start_detection(request: DetectionRequest):
-    guid = str(uuid.uuid4())
-    
-    # Proper lock usage
-    task_lock.acquire()
-    try:
-        active_tasks[guid] = {
-            "stop_flag": False,
-            "status": "started",
-            "result": None,
-            "error": None
-        }
-    finally:
-        task_lock.release()
-    
-    executor.submit(run_anomaly_task, guid, request.query, request.parameters)
-    return {"guid": guid}
-
-@router.post("/anomaly/streaming/stop/{guid}")
-async def stop_detection(guid: str):
-    task_lock.acquire()
-    try:
-        task = active_tasks.get(guid)
-        if not task:
-            raise HTTPException(status_code=404, detail="Task not found")
-        if task['status'] in ['completed', 'failed', 'stopped']:
-            raise HTTPException(status_code=400, detail=f"Task already {task['status']}")
-        task['stop_flag'] = True
-        task['status'] = 'stopping'
-    finally:
-        task_lock.release()
-    
-    await emit_status(guid, 'stopping')
-    return {"message": "Stop signal sent", "guid": guid}
-
-@app.get("/ml/status/{guid}")
-async def get_status(guid: str):
-    with task_lock:
-        task = active_tasks.get(guid)
-        if not task:
-            raise HTTPException(status_code=404, detail="Task not found")
-        return {**task, "guid": guid}
 
 
-@app.post("/forecast/streaming/start")
-async def start_forecast(request: ForecastRequest):
-    guid = str(uuid.uuid4())
-    with task_lock:
-        active_tasks[guid] = {
-            "stop_flag": False,
-            "status": "started",
-            "result": None,
-            "error": None
-        }
-    executor.submit(
-        run_forecast_task,
-        guid,
-        request.query,
-        request.parameters,
-        request.future_days
-    )
-    return {"guid": guid}
+
+@app.post("/detect/start/{task_name}")
+async def run_detection(task_name: str,req: Request, background_tasks: BackgroundTasks):
+    req_info = await req.json()
+    task = celery.send_task(task_name,args=[req_info] )
+    return {"message": "Task received 🔄", "task_id": task.id}
 
 
-@app.post("/forecast/streaming/stop/{guid}")
-async def stop_forecast(guid: str):
-    with task_lock:
-        task = active_tasks.get(guid)
-        if not task:
-            raise HTTPException(status_code=404, detail="Task not found")
-        if task['status'] in ['completed', 'failed', 'stopped']:
-            raise HTTPException(status_code=400, detail=f"Task already {task['status']}")
-        task['stop_flag'] = True
-        task['status'] = 'stopping'
-        await emit_status(guid, 'stopping')
-    return {"message": "Stop signal sent", "guid": guid}
-
-
-@router.post("/router/anomaly/streaming/start")
-async def start_detection(request: DetectionRequest):
-    guid = str(uuid.uuid4())
-    with task_lock:
-        active_tasks[guid] = {
-            "stop_flag": False,
-            "status": "started",
-            "result": None,
-            "error": None
-        }
-    executor.submit(run_anomaly_task, guid, request.query, request.parameters)
-    return {"guid": guid}
-
-@router.post("/router/anomaly/streaming/stop/{guid}")
-async def stop_detection(guid: str):
-    with task_lock:
-        task = active_tasks.get(guid)
-        if not task:
-            raise HTTPException(status_code=404, detail="Task not found")
-        if task['status'] in ['completed', 'failed', 'stopped']:
-            raise HTTPException(status_code=400, detail=f"Task already {task['status']}")
-        task['stop_flag'] = True
-        task['status'] = 'stopping'
-        await emit_status(guid, 'stopping')
-    return {"message": "Stop signal sent", "guid": guid}
-
-@router.get("router/ml/status/{guid}")
-async def get_status(guid: str):
-    with task_lock:
-        task = active_tasks.get(guid)
-        if not task:
-            raise HTTPException(status_code=404, detail="Task not found")
-        return {**task, "guid": guid}
-
-app.include_router(router)
+@app.get("/status/{task_id}")
+def get_status(task_id):
+    return JSONResponse(content=get_api_task_status(task_id))
