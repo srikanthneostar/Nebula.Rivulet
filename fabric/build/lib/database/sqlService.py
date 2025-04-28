@@ -9,7 +9,7 @@ from configuration.appConfigProvider import AppConfigProvider
 class SqlConnector(SqlConnectorInterface):
     def __init__(self):
         dataProvider = AppConfigProvider()
-        sql_category = dataProvider.get_by_category("DataSource")
+        sql_category = dataProvider.get_config_by_category("DataSource")
         self.username = self.get_config_values(
             sql_category=sql_category, keyname='USERNAME')
         self.password = self.get_config_values(
@@ -18,9 +18,9 @@ class SqlConnector(SqlConnectorInterface):
             sql_category=sql_category, keyname='DATABASEURI')
 
     def get_config_values(self, sql_category, keyname):
-        first_obj = list(filter(lambda x: x.key == keyname, sql_category))[0]
-        if (first_obj is not None):
-            return first_obj.value
+        filtered_list = list(filter(lambda x: x.key == keyname, sql_category))
+        if filtered_list:
+            return filtered_list[0].value
         else:
             return ''
 
