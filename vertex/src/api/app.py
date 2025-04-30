@@ -1,13 +1,9 @@
-
 import json
 import os
 from celery import Celery
-from algorithms.anomalyDetection import AnomalyDetection
-from algorithms.forecasting import Forecasting
+from services.vertexMLService import mlService
 import numpy as np
 import pandas as pd
-
-
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,24 +22,14 @@ celery.conf.update(
     enable_utc=True
 )
 
+algo = mlService()
 
 @celery.task(name='detect_anomalies')
 def detect_anomalies_task(params: dict):
     try:
         query = int(params["queryid"])
-        detector = AnomalyDetection(query)
-        df_feat = detector.feature_engineering(detector.df)
-        
-        # Convert to JSON-serializable format
-        result = detector.train_and_detect(df_feat)
-        
-        # Add additional metadata
-        # result["metadata"] = {
-        #     "query_id": query,
-        #     "processed_records": len(detector.df)
-        # }
-        return result
-        
+        detector = algo.detect_anomalies_task(query)
+        return detector
     except Exception as e:
         return {"error": str(e)}
 
@@ -53,8 +39,8 @@ def forecasting_task(parameters: dict):
     try:
         query = int(parameters["queryid"])
         future_days = int(parameters["future_days"])
-        detector = Forecasting(query, future_days)
-        return detector.get_forecast()
+        detector = algo.forecasting_task(query, future_days)
+        return detector
     except Exception as e:
         return {"error": str(e)}
 
