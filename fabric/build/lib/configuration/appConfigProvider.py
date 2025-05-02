@@ -3,15 +3,15 @@ import sqlite3
 from typing import List
 from dataclasses import dataclass
 import os
-
+from configuration.NebulaCipher import decrypt
 
 @dataclass
 class AppConfig:
     key: str
     value: str
+    description: str
     category: str
     isEncrypted: bool
-    description: str
 
 
 class AppConfigProvider:
@@ -22,6 +22,8 @@ class AppConfigProvider:
                 "NEBULA_HOME environment variable is not defined")
         self.db_path = f"{nebula_home}/Nebula.Rivulet.db"
         self.create_db()
+        self.SECRET_KEY = self.get_by_key_no_decrypt("SECRET_KEY").value
+        self.SECRET_SALT = self.get_by_key_no_decrypt("SECRET_SALT").value
 
     def create_db(self):
         if not os.path.exists(self.db_path):
@@ -83,3 +85,23 @@ class AppConfigProvider:
                 (config.value, config.description, config.key)
             )
             return cursor.rowcount > 0
+
+    def get_by_key_no_decrypt(self, key) -> AppConfig:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            result = cursor.execute("SELECT * FROM appconfig WHERE key=?", (key,)).fetchone()
+            if result is None:
+                raise ValueError(f"No configuration found for key: {key}")
+            config = AppConfig(
+                key=result[0],
+                value=result[1],
+                description=result[2],
+                category=result[3],
+                isEncrypted=bool(result[4]),
+            )
+            return config
+
+    def decrypt_config(self, config: AppConfig):
+        if config.isEncrypted:
+            config.value = decrypt(config.value, secret_key=self.SECRET_KEY, salt=self.SECRET_SALT)
+        return config

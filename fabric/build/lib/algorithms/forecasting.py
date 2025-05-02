@@ -1,9 +1,12 @@
 # core.py
+import json
+import math
 import pandas as pd
 import numpy as np
 import xgboost as xgb
 from datetime import timedelta
 from database.sqlService import SqlConnector
+from messaging.NebulaRequestProducer import NebulaRequestProducer
 
 sql = SqlConnector()
 
@@ -11,6 +14,7 @@ class Forecasting:
     def __init__(self, queryid: int, future_days=30):
         self.queryid = queryid
         self.forecast_days = future_days
+        self.producer = NebulaRequestProducer()
 
     def get_application_query(self):
         """Get query text safely using parameterized SQL"""
@@ -144,11 +148,38 @@ class Forecasting:
             forecast = self.forecast_future(
                 model, last_values, base_date, self.forecast_days, feature_cols
             )
-            
-            return {
-                "historical": df[["date", "value"]].assign(date=lambda x: x["date"].dt.strftime('%Y-%m-%d'))
-                .to_dict(orient="records"),
-                "forecast": forecast.to_dict(orient="records")
-            }
+
+            # res = {
+            #     "historical": df[["date", "value"]].assign(date=lambda x: x["date"].dt.strftime('%Y-%m-%d'))
+            #     .to_dict(orient="records"),
+            #     "forecast": forecast.to_dict(orient="records")
+            # }
+
+            response_json = {
+            "category": "week",
+            "predictions": [
+                {
+                    "predictedDate": row["date"],
+                    "predictedValue": math.ceil(row["forecast"])
+                }
+                for row in forecast.to_dict(orient="records")
+            ]
+        }
+            return response_json
+            # # print("RESPONSE----->",response_json)
+            # reqPayLoad = self.producer.get_request_payload(
+            #     'TimeseriesForecasting', json.dumps(response_json))
+            # self.producer.get_producer().sendMessage(
+            #     'nebula.timeseries.forecasting', reqPayLoad)
+        
         except Exception as e:
             return {"error": str(e)}
+        
+        finally:
+            if response_json != None:
+                reqPayLoad = self.producer.get_request_payload(
+                    'TimeseriesForecasting', json.dumps(response_json))
+                self.producer.get_producer().sendMessage(
+                    'nebula.timeseries.forecasting', reqPayLoad)
+            else:
+                print("Error in forecasting")
