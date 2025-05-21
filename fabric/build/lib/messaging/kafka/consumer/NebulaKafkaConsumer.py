@@ -1,5 +1,5 @@
 from messaging.interfaces.consumer.NebulaConsumer import NebulaConsumer
-from messaging.kafka.consumer.NebulaKafkaConsumer import KafkaConsumer
+from kafka import KafkaConsumer
 
 
 class NebulaKafkaConsumer(NebulaConsumer):

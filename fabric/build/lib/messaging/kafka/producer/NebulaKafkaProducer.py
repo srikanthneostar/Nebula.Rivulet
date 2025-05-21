@@ -1,5 +1,5 @@
 import json
-from messaging.kafka.producer.NebulaKafkaProducer import KafkaProducer
+from kafka import KafkaProducer
 from messaging.entities.requests.RequestPayload import RequestPayload
 from messaging.interfaces.producer.NebulaProducer import NebulaProducer
 from messaging.serializers.NebulaSerializer import NebulaSerializer
