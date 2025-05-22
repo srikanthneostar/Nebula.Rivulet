@@ -28,3 +28,7 @@ vertex/src/api/__pycache__
 vertex/src/api/services/__pycache__
 vertex/src/api/app.log
 /.venv/*
+configurations/knowledge/__pycache__/
+fabric/build/lib/database/__pycache__/
+configurations/rivulet_db/
+configurations/context_db

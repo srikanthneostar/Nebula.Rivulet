@@ -9,8 +9,8 @@ class FaissSearch:
         appConfigProvider = AppConfigProvider()
         configs = appConfigProvider.get_config_by_category("CHROMADB")
         model = [config for config in configs if config.key == "CHROMA_MODEL"][0].value
-        nebula_home = os.getenv("NEBULA_HOME")
-        db_path = os.path.join(nebula_home, "nebula_db")
+        rivulet_home = os.getenv("RIVULET_HOME")
+        db_path = os.path.join(rivulet_home, "rivulet_db")
         self.faissService = FaissService(model, collection_name="journalevents", db_path=db_path)
         self.logger = get_fabric_logger(__name__)
 

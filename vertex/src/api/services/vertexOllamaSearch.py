@@ -5,23 +5,24 @@ from llms.ollamaService import OllamaService
 from database.elasticService import ElasticService
 import json
 import uuid
+from uuid import uuid4
 from enums.chat_enum import ChatHistoryType
-from knowledge.config_util import ConfigUtil
 from chatHistoryFactory.chat import ChatHistoryFactory
-from opensearchpy import OpenSearch
-
+from knowledge.config_util import ConfigUtil
 
 class OllamaSearch:
     def __init__(self):
-        self.config = ConfigUtil.get_knowledge_config()
         self.appConfigProvider = AppConfigProvider()
         configs = self.appConfigProvider.get_config_by_category("OLLAMA")
         host_address = [config for config in configs if config.key == "HOST"][0].value
         self.model_name = [config for config in configs if config.key == "MODEL"][0].value
         self.ollamaService = OllamaService(self.model_name, host_address)
+        self.config = ConfigUtil.get_knowledge_config()
 
-        nebula_home = os.getenv("NEBULA_HOME")
-        self.context_path = os.path.join(nebula_home, "nebula_db")
+        rivulet_home = os.getenv("RIVULET_HOME")
+        if rivulet_home is None:
+            raise ValueError("RIVULET_HOME environment variable is not set.")
+        self.context_path = os.path.join(rivulet_home, "context_db")
 
         es_config = self.appConfigProvider.get_config_by_category("ELASTIC")
         self.es_host = [config for config in es_config if config.key == "elastic.hosts"][0].value
@@ -38,7 +39,7 @@ class OllamaSearch:
                 "bool": {
                     "must": [
                         {"match": {"entityId": entityid}},
-                        {"terms": {"entity.ID": ids}},
+                        {"terms": {"entity.id": ids}},
                     ]
                 }
             }
@@ -81,8 +82,8 @@ class OllamaSearch:
         history_type = ChatHistoryType(history_type.lower())
 
         if session_id is None:
-            session_id = str(uuid.uuid4())
-
+            session_id = str(uuid4())
+        self.logger.info(f"Session ID: {session_id}")
         chat_history = ChatHistoryFactory.create_chat_history(history_type, session_id)
         chat_history.add_message("user", query)
 

@@ -7,9 +7,9 @@ from langchain_community.chat_message_histories.file import FileChatMessageHisto
 class FileChatHistory(ChatMessageHistory):
 
     def __init__(self, session_id: str, file_path=None):
-        nebula_home = os.getenv("NEBULA_HOME")
+        rivulet_home = os.getenv("RIVULET_HOME")
         if file_path is None:
-            file_path = os.path.join(nebula_home, "chat_history", f"{session_id}.json")
+            file_path = os.path.join(rivulet_home, "chat_history", f"{session_id}.json")
         self.file_path = file_path
         self.file_chat_history = FileChatMessageHistory(file_path=self.file_path)
         print(f"File path for chat history: {self.file_path}")

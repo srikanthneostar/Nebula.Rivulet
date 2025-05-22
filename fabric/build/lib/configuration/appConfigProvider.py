@@ -16,11 +16,11 @@ class AppConfig:
 
 class AppConfigProvider:
     def __init__(self):
-        nebula_home = os.environ.get('NEBULA_HOME')
-        if not nebula_home:
+        rivulet_home = os.environ.get('RIVULET_HOME')
+        if not rivulet_home:
             raise EnvironmentError(
-                "NEBULA_HOME environment variable is not defined")
-        self.db_path = f"{nebula_home}/Nebula.Rivulet.db"
+                "RIVULET_HOME environment variable is not defined")
+        self.db_path = f"{rivulet_home}/Nebula.Rivulet.db"
         self.create_db()
         self.SECRET_KEY = self.get_by_key_no_decrypt("SECRET_KEY").value
         self.SECRET_SALT = self.get_by_key_no_decrypt("SECRET_SALT").value

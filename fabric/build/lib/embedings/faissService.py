@@ -8,7 +8,7 @@ import shutil
 import os
 
 class FaissService:
-    def __init__(self, model_name: str, collection_name: str, db_path: str = "./nebula_db"):
+    def __init__(self, model_name: str, collection_name: str, db_path: str = "./rivulet_db"):
         self.sentence_Transformer = SentenceTransformerEmbeddings(model_name=model_name)
         self.db_path = db_path
         self.collection_name = collection_name
