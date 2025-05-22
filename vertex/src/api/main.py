@@ -11,6 +11,7 @@ from auth import create_access_token, verify_token
 from services.vertexChromaService import ChromaSearch
 from services.vertexFaissService import FaissSearch
 from services.vertexOllamaSearch import OllamaSearch
+from knowledge.config_util import ConfigUtil
 import os
 from fastapi import BackgroundTasks
 from app import celery, get_api_task_status
@@ -261,21 +262,10 @@ async def llm_search(
 
 @app.post("/knowledge/questions", tags=["search"])
 async def get_knowledge_questions(
-    request: dict,
     current_user: str = Depends(verify_token)
 ):
     try:
-        if not request.get("config_path"):
-            raise HTTPException(
-                status_code=400, detail="Config path cannot be empty")
-
-        root_path = os.path.dirname(os.path.dirname(
-            os.path.dirname(os.path.abspath(__file__)))).replace("\\vertex", "\\rivulet\\src\\knowledge")
-        config_file_path = os.path.join(
-            root_path, request["config_path"].replace(".json", "")+".json")
-
-        with open(config_file_path, 'r') as f:
-            config = json.load(f)
+        config = ConfigUtil.get_knowledge_config()
 
         if "questions" not in config[1]:
             raise HTTPException(
@@ -283,11 +273,6 @@ async def get_knowledge_questions(
 
         return config[1]["questions"]
 
-    except FileNotFoundError:
-        raise HTTPException(
-            status_code=404,
-            detail="Config file not found"
-        )
     except json.JSONDecodeError:
         raise HTTPException(
             status_code=400,
@@ -298,6 +283,7 @@ async def get_knowledge_questions(
             status_code=500,
             detail=f"Failed to get questions: {str(e)}"
         )
+
 
 
 @app.post("/chat_history/session", tags=["search"])

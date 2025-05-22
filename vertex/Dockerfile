@@ -3,7 +3,7 @@ FROM python:3.12-slim
 RUN mkdir -p /usr/Nebula.Rivulet
 RUN mkdir -p /usr/Nebula.Rivulet/db
 COPY /Nebula.Rivulet.db /usr/Nebula.Rivulet/db
-ENV NEBULA_HOME=/usr/Nebula.Rivulet/db
+ENV RIVULET_HOME=/usr/Nebula.Rivulet/db
 
 # Set the working directory
 WORKDIR /app

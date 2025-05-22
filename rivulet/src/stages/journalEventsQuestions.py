@@ -35,7 +35,7 @@ class JournalEventQuestions(PipelineStage):
             root_path = os.path.dirname(os.path.dirname(
             os.path.dirname(os.path.abspath(__file__))))
             
-            root_path = root_path.replace("\\rivulet", "\\rivulet\\src\\knowledge")
+            root_path = root_path.replace("\\rivulet", "\\configurations\\knowledge_db")
             config_path = os.path.join(root_path, "knowledge_config.json")
             
             with open(config_path, 'r') as f:
