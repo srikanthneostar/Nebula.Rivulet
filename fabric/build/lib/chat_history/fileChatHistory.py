@@ -3,11 +3,13 @@ import json
 from typing import List, Dict, Any
 from chat_history.chat_source import ChatMessageHistory
 from langchain_community.chat_message_histories.file import FileChatMessageHistory
+from configuration.envConfig import EnvConfig
 
 class FileChatHistory(ChatMessageHistory):
 
     def __init__(self, session_id: str, file_path=None):
-        rivulet_home = os.getenv("RIVULET_HOME")
+        config = EnvConfig()
+        rivulet_home = config.get_env_variable()
         if file_path is None:
             file_path = os.path.join(rivulet_home, "chat_history", f"{session_id}.json")
         self.file_path = file_path

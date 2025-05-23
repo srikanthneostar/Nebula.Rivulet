@@ -9,7 +9,7 @@ class JournalEventsSource(DataSource):
     def __init__(self):
         appConfigProvider = AppConfigProvider()
         self.search_service = SearchService()
-        self.knowledge = ConfigUtil.get_knowledge_config()
+        self.knowledge = ConfigUtil.get_knowledge_config(self)
         self.logger = get_fabric_logger(__name__)
         config = appConfigProvider.get_config("MAXID")
         self.config = config

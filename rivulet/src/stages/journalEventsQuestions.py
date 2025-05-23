@@ -14,7 +14,7 @@ class JournalEventQuestions(PipelineStage):
         model_name = [config for config in configs if config.key == "MODEL"][0].value
         self.ollamaService = OllamaService(model_name,host_address)
         self.logger = get_fabric_logger(__name__)
-        self.configuration = ConfigUtil.get_knowledge_config()
+        self.configuration = ConfigUtil.get_knowledge_config(self)
         
     def process(self, data: any) -> any:
         questions = []

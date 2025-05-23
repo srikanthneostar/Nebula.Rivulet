@@ -4,6 +4,7 @@ from typing import List
 from dataclasses import dataclass
 import os
 from configuration.NebulaCipher import decrypt
+from configuration.envConfig import EnvConfig
 
 @dataclass
 class AppConfig:
@@ -16,10 +17,8 @@ class AppConfig:
 
 class AppConfigProvider:
     def __init__(self):
-        rivulet_home = os.environ.get('RIVULET_HOME')
-        if not rivulet_home:
-            raise EnvironmentError(
-                "RIVULET_HOME environment variable is not defined")
+        config = EnvConfig()
+        rivulet_home = config.get_env_variable()
         self.db_path = f"{rivulet_home}/Nebula.Rivulet.db"
         self.create_db()
         self.SECRET_KEY = self.get_by_key_no_decrypt("SECRET_KEY").value

@@ -5,6 +5,7 @@ from langchain.schema import Document
 from embedings.chromaService import  ChromaService
 from framework.pipeline_stage import PipelineStage
 from configuration.appConfigProvider import AppConfigProvider
+from configuration.envConfig import EnvConfig
 from logs.logs import get_fabric_logger
 
 class JournalEventEmbedding(PipelineStage):
@@ -12,7 +13,8 @@ class JournalEventEmbedding(PipelineStage):
         appConfigProvider = AppConfigProvider()
         configs = appConfigProvider.get_config_by_category("CHROMADB")
         model = [config for config in configs if config.key == "CHROMA_MODEL"][0].value
-        rivulet_home = os.getenv("RIVULET_HOME")
+        config = EnvConfig()
+        rivulet_home = config.get_env_variable()
         db_path = str(os.path.join(rivulet_home, "rivulet_db"))
         # self.faissService = FaissService(model, collection_name="journalevents", db_path=self.db_path)
         self.chromaService = ChromaService(model, collection_name="journalevents",db_path=db_path)

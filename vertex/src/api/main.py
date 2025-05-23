@@ -265,7 +265,8 @@ async def get_knowledge_questions(
     current_user: str = Depends(verify_token)
 ):
     try:
-        config = ConfigUtil.get_knowledge_config()
+        db_json = ConfigUtil()
+        config = db_json.get_knowledge_config()
 
         if "questions" not in config[1]:
             raise HTTPException(
