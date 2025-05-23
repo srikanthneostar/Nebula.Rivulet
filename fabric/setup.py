@@ -3,8 +3,8 @@ from setuptools import setup, find_packages
 setup(
     name="nebula.fabric",
     version="3.10.0",
-    packages=find_packages(where="src"),
-    package_dir={"": "src"},
+    packages=find_packages(where="build/lib"),
+    package_dir={"": "build/lib"},
     install_requires=[
         "elasticsearch>=7.0.0,<8.0.0",
         "pandas>=1.0.0",
@@ -18,6 +18,8 @@ setup(
         "langchain-openai",
         "python-dotenv",
         "scikit-learn>=0.24.0",
+        "transformers==4.39.3",
+        "sentence-transformers==2.4.0",
     ],
     author="Administrator",
     author_email="admin@xecutables.com",

@@ -1,6 +1,7 @@
 from embedings.chromaService import ChromaService
 from logs.logs import get_fabric_logger
 from configuration.appConfigProvider import AppConfigProvider
+from configuration.envConfig import EnvConfig
 import os
 from llms.ollamaService import OllamaService
 
@@ -9,7 +10,8 @@ class ChromaSearch:
         appConfigProvider = AppConfigProvider()
         configs = appConfigProvider.get_config_by_category("CHROMADB")
         model = [config for config in configs if config.key == "CHROMA_MODEL"][0].value
-        rivulet_home = os.getenv("RIVULET_HOME")
+        config = EnvConfig()
+        rivulet_home = config.get_env_variable()
         db_path = os.path.join(rivulet_home, "rivulet_db")
         self.chromaService = ChromaService(model, collection_name="journalevents",db_path=db_path)
         self.logger = get_fabric_logger(__name__)

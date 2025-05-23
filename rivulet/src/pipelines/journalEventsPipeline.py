@@ -8,7 +8,7 @@ from stages.journalEventSummary import JournalEventSummary
 
 class JournalEventsPipeline:
     def __init__(self):
-        self.configuration = ConfigUtil.get_knowledge_config()
+        self.configuration = ConfigUtil.get_knowledge_config(self)
         self.pipeline = Pipeline(data_source=JournalEventsSource())
         # self.pipeline.add_stage(JournalEventsQAstage(self.configuration[1]))
         self.pipeline.add_stage(JournalEventSummary())

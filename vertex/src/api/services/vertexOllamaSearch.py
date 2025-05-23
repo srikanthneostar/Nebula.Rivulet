@@ -1,11 +1,11 @@
 from logs.logs import get_fabric_logger
 from configuration.appConfigProvider import AppConfigProvider
+from configuration.envConfig import EnvConfig
 import os
 from llms.ollamaService import OllamaService
 from database.elasticService import ElasticService
 import json
 import uuid
-from uuid import uuid4
 from enums.chat_enum import ChatHistoryType
 from chatHistoryFactory.chat import ChatHistoryFactory
 from knowledge.config_util import ConfigUtil
@@ -17,12 +17,11 @@ class OllamaSearch:
         host_address = [config for config in configs if config.key == "HOST"][0].value
         self.model_name = [config for config in configs if config.key == "MODEL"][0].value
         self.ollamaService = OllamaService(self.model_name, host_address)
-        self.config = ConfigUtil.get_knowledge_config()
-
-        rivulet_home = os.getenv("RIVULET_HOME")
-        if rivulet_home is None:
-            raise ValueError("RIVULET_HOME environment variable is not set.")
+        self.config = ConfigUtil.get_knowledge_config(self)
+        config = EnvConfig()
+        rivulet_home = config.get_env_variable()
         self.context_path = os.path.join(rivulet_home, "context_db")
+        os.makedirs(self.context_path, exist_ok=True)
 
         es_config = self.appConfigProvider.get_config_by_category("ELASTIC")
         self.es_host = [config for config in es_config if config.key == "elastic.hosts"][0].value
@@ -82,7 +81,7 @@ class OllamaSearch:
         history_type = ChatHistoryType(history_type.lower())
 
         if session_id is None:
-            session_id = str(uuid4())
+            session_id = str(uuid.uuid4())
         self.logger.info(f"Session ID: {session_id}")
         chat_history = ChatHistoryFactory.create_chat_history(history_type, session_id)
         chat_history.add_message("user", query)

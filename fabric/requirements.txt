@@ -77,7 +77,6 @@ ctransformers==0.2.27
 cycler==0.12.1
 dataclasses-json==0.6.7
 datasets==2.21.0
-datasource @ file:///C:/Nebula_v2/app/nebulaspock/libraries/datasources/dist/datasource-3.2.2.24-py3-none-any.whl#sha256=668e22f09cd1a3cb510e1d0ea5b56a0c3b3ca9dda6c66ed71632542e8e1f5866
 decorator==5.2.1
 deepdiff==8.2.0
 defusedxml==0.7.1
@@ -258,7 +257,6 @@ matplotlib-inline==0.1.7
 mcp==1.1.3
 mdurl==0.1.2
 mem0ai==0.1.34
-messaging @ file:///C:/Nebula_v2/app/nebulaspock/libraries/messaging/dist/messaging-3.2.2.24-py3-none-any.whl#sha256=d918b576d825c7a3616f04f5e2b6f58e6646a6c1352c9e56d46f117b40d0a847
 metal_sdk==2.5.1
 metaphor-python==0.1.23
 mistralai==1.5.0
@@ -275,8 +273,6 @@ names==0.3.0
 namex==0.0.8
 nanoid==2.0.0
 narwhals==1.29.1
-nebula.fabric @ file:///C:/nebula.rivulet/fabric/dist/nebula_fabric-3.10.0-py3-none-any.whl#sha256=cd86f7e87b8b669e1b5398554dd7d5091603653672b97ae648be0098677459d2
-nebula.rivulet.fabric @ file:///C:/nebula.rivulet/fabric/dist/nebula.rivulet.fabric-3.10.0-py3-none-any.whl#sha256=83ea8935b85f26ab49320192471df55f625f1bbb730ad9ed98097deabece1a90
 needle-python==0.4.0
 nest-asyncio==1.6.0
 networkx==3.4.2
