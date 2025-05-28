@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import xgboost as xgb
 from datetime import timedelta
+import argparse
 from database.sqlService import SqlConnector
 from messaging.NebulaRequestProducer import NebulaRequestProducer
 
@@ -17,15 +18,13 @@ class Forecasting:
         self.producer = NebulaRequestProducer()
 
     def get_application_query(self):
-        """Get query text safely using parameterized SQL"""
         try:
-            qry = "SELECT QUERY FROM APPLICATIONQUERIES WHERE ID = ?"  # Parameter placeholder
-            results = sql.execute_Sql(qry, (self.queryid,))  # Pass as tuple
+            qry = "SELECT QUERY FROM APPLICATIONQUERIES WHERE ID = ?"
+            results = sql.execute_Sql(qry, (self.queryid,)) # type: ignore
             
-            if results.empty:  # Replace "if not results"
+            if results.empty:
                 raise ValueError(f"No query found with ID {self.queryid}")
                 
-            # Handle different result types
             if isinstance(results, pd.DataFrame):
                 return results.iloc[0]['QUERY']
             elif isinstance(results, list) and len(results) > 0:
@@ -38,31 +37,23 @@ class Forecasting:
             raise
 
     def load_and_prepare_data(self, query):
-        """Load data with enhanced validation"""
         try:
             df = sql.execute_Sql(query)
-            
-            # Check for empty results
-            if df is None:
-                return None
-            if len(df) < 10:  # Now safe to check length
+            if df is None or len(df) < 10:
                 print("Insufficient data rows")
                 return None
                             
-            # Validate required columns
             required_cols = {"date", "value"}
             if not required_cols.issubset(df.columns):
                 missing = required_cols - set(df.columns)
                 print(f"Missing columns: {missing}")
                 return None
                 
-            # Validate date format
             df["date"] = pd.to_datetime(df["date"], errors='coerce')
             if df["date"].isnull().any():
                 print("Invalid date format (YYYY-MM-DD required)")
                 return None
                 
-            # Process data
             df = (
                 df.drop_duplicates("date")
                 .sort_values("date")
@@ -77,7 +68,7 @@ class Forecasting:
             print(f"Data loading error: {str(e)}")
             return None
 
-    def feature_engineering(self,df):
+    def feature_engineering(self, df):
         for lag in [1, 2, 3, 7]:
             df[f"lag_{lag}"] = df["value"].shift(lag)
         df["rolling_mean_7"] = df["value"].rolling(window=7).mean()
@@ -88,7 +79,7 @@ class Forecasting:
         df.dropna(inplace=True)
         return df
 
-    def train_model(self,X, y):
+    def train_model(self, X, y):
         model = xgb.XGBRegressor(
             objective="reg:squarederror",
             n_estimators=200,
@@ -99,7 +90,7 @@ class Forecasting:
         model.fit(X, y)
         return model
 
-    def forecast_future(self,model, last_known_values, base_date, future_days, feature_cols):
+    def forecast_future(self, model, last_known_values, base_date, future_days, feature_cols):
         forecast_dates = [base_date + timedelta(days=i) for i in range(1, future_days + 1)]
         forecasts = []
         history = last_known_values.copy()
@@ -127,7 +118,6 @@ class Forecasting:
         })
 
     def get_forecast(self):
-        """Main forecasting process with validation"""
         try:
             query = self.get_application_query()
             df = self.load_and_prepare_data(query)
@@ -137,7 +127,6 @@ class Forecasting:
             if len(df) < 10:
                 return {"error": "Need at least 10 days of historical data"}
                 
-            # Feature engineering and modeling
             df = self.feature_engineering(df)
             feature_cols = [col for col in df.columns if col not in ["date", "value"]]
             
@@ -149,37 +138,36 @@ class Forecasting:
                 model, last_values, base_date, self.forecast_days, feature_cols
             )
 
-            # res = {
-            #     "historical": df[["date", "value"]].assign(date=lambda x: x["date"].dt.strftime('%Y-%m-%d'))
-            #     .to_dict(orient="records"),
-            #     "forecast": forecast.to_dict(orient="records")
-            # }
-
             response_json = {
-            "category": "week",
-            "predictions": [
-                {
-                    "predictedDate": row["date"],
-                    "predictedValue": math.ceil(row["forecast"])
-                }
-                for row in forecast.to_dict(orient="records")
-            ]
-        }
+                "category": "week",
+                "predictions": [
+                    {
+                        "predictedDate": row["date"],
+                        "predictedValue": math.ceil(row["forecast"])
+                    }
+                    for row in forecast.to_dict(orient="records")
+                ]
+            }
+            # print("Forecasting completed successfully", response_json)
             return response_json
-            # # print("RESPONSE----->",response_json)
-            # reqPayLoad = self.producer.get_request_payload(
-            #     'TimeseriesForecasting', json.dumps(response_json))
-            # self.producer.get_producer().sendMessage(
-            #     'nebula.timeseries.forecasting', reqPayLoad)
-        
+
         except Exception as e:
             return {"error": str(e)}
         
         finally:
-            if response_json != None:
+            if 'response_json' in locals() and response_json is not None:
                 reqPayLoad = self.producer.get_request_payload(
                     'TimeseriesForecasting', json.dumps(response_json))
                 self.producer.get_producer().sendMessage(
                     'nebula.timeseries.forecasting', reqPayLoad)
             else:
                 print("Error in forecasting")
+
+# Entry point for CLI execution
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run time series forecasting.")
+    parser.add_argument("--queryid", type=int, required=True, help="Query ID to fetch the SQL query")
+    parser.add_argument("--futuredays", type=int, default=30, help="Number of future days to forecast")
+    args = parser.parse_args()
+    fcast = Forecasting(queryid=args.queryid, future_days=args.futuredays)
+    output = fcast.get_forecast()

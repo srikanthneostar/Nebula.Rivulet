@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from database.sqlService import SqlConnector
-import pyodbc
+import argparse
 sql = SqlConnector()
 
 
@@ -16,7 +16,7 @@ class AnomalyDetection:
         """Get query text safely using parameterized SQL"""
         try:
             qry = "SELECT QUERY FROM APPLICATIONQUERIES WHERE ID = ?"
-            results = sql.execute_Sql(qry, (self.queryid,))
+            results = sql.execute_Sql(qry, (self.queryid,)) # type: ignore
             
             if results.empty:  # Replace "if not results"
                 raise ValueError(f"No query found with ID {self.queryid}")
@@ -72,5 +72,19 @@ class AnomalyDetection:
         errors = np.abs(y_test - y_pred)
         threshold = np.percentile(errors, 95)
         anomalies = test[errors > threshold]
+        # print(f"Detected {len(anomalies)} anomalies out of {len(test)} test points.")
         return {
             "anomalies":anomalies}
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Anomaly Detection using Random Forest")
+    parser.add_argument("--queryid", type=int, required=True, help="Query ID to fetch data")
+    args = parser.parse_args()
+    anomaly_detector = AnomalyDetection(args.queryid)
+    df = anomaly_detector.df
+    if df is not None and not df.empty:
+        df = anomaly_detector.feature_engineering(df)
+        results = anomaly_detector.train_and_detect(df)
+    else:
+        print("No valid data available for anomaly detection.")
