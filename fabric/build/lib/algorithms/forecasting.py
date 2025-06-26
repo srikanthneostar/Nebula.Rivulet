@@ -41,6 +41,9 @@ class Forecasting:
     def load_and_prepare_data(self, query):
         try:
             df = sql.execute_Sql(query)
+            last_col_value = df.iloc[0, -1]
+            if "ENTITYNAME" in df.columns:
+                df = df.drop(columns=["ENTITYNAME"])
             if df is None or len(df) < 10:
                 print("Insufficient data rows")
                 return None
@@ -64,7 +67,7 @@ class Forecasting:
                 .reset_index()
             )
 
-            return df.dropna(subset=["value"])
+            return df.dropna(subset=["value"]), last_col_value
 
         except Exception as e:
             print(f"Data loading error: {str(e)}")
@@ -129,7 +132,7 @@ class Forecasting:
         try:
             print("Starting forecasting process...\n")
             query = self.get_application_query()
-            df = self.load_and_prepare_data(query)
+            df, df2 = self.load_and_prepare_data(query)
 
             if df is None:
                 return {"error": "Data loading failed"}
@@ -147,32 +150,29 @@ class Forecasting:
                 model, last_values, base_date, self.forecast_days, feature_cols
             )
 
-            response_json = {
-                "category": "week",
-                "predictions": [
-                    {
-                        "predictedDate": row["date"],
-                        "predictedValue": math.ceil(row["forecast"]),
-                    }
-                    for row in forecast.to_dict(orient="records")
-                ],
-            }
-            # print("Forecasting completed successfully", response_json)
+            response_json = [
+                {
+                    "category": "week",
+                    "predictedDate": row["date"],
+                    "predictedValue": math.ceil(row["forecast"]),
+                    "entityname": df2,
+                }
+                for row in forecast.to_dict(orient="records")
+            ]
+            print("Forecasting completed successfully", response_json)
+            # print("Response JSON:", json.dumps(response_json))
             return response_json
 
         except Exception as e:
             return {"error": str(e)}
 
         finally:
-            if "response_json" in locals() and response_json is not None:
-                reqPayLoad = self.producer.get_request_payload(
-                    "TimeseriesForecasting", json.dumps(response_json)
-                )
-                self.producer.get_producer().sendMessage(
-                    "nebula.timeseries.forecasting", reqPayLoad
-                )
-            else:
-                print("Error in forecasting")
+            reqPayLoad = self.producer.get_request_payload(
+                "TimeseriesForecasting", json.dumps(response_json)
+            )
+            self.producer.get_producer().sendMessage(
+                "nebula.processor.sink.forecasting", reqPayLoad
+            )
 
 
 # Entry point for CLI execution
@@ -189,17 +189,17 @@ if __name__ == "__main__":
     output = fcast.get_forecast()
     print("Forecasting output:", output)
     # Save output to TXT file
-    file_number = 1
-    while True:
-        output_file = f"output{file_number}.txt"
-        if not os.path.exists(output_file):
-            break
-        file_number += 1
+    # file_number = 1
+    # while True:
+    #     output_file = f"output{file_number}.txt"
+    #     if not os.path.exists(output_file):
+    #         break
+    #     file_number += 1
 
-    # Write to the new file
-    try:
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(str(output))
-        print(f"Results written to {output_file}")
-    except Exception as e:
-        print(f"Error writing to file: {str(e)}")
+    # # Write to the new file
+    # try:
+    #     with open(output_file, "w", encoding="utf-8") as f:
+    #         f.write(str(output))
+    #     print(f"Results written to {output_file}")
+    # except Exception as e:
+    #     print(f"Error writing to file: {str(e)}")
