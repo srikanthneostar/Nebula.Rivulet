@@ -7,12 +7,10 @@ from messaging.entities.requests.ApplicationSystems import ApplicationSystems
 from messaging.entities.requests.RequestPayload import RequestPayload
 from messaging.entities.requests.SystemRequest import SystemRequest
 from messaging.interfaces.producer.NebulaProducer import NebulaProducer
-from messaging.kafka.producer.NebulaKafkaProducer import \
-    NebulaKafkaProducer
-from messaging.mqtt.producer.NebulaMQTTProducer import \
-    NebulaMQTTProducer
-from messaging.rabbitMQ.producer.NebulaRabbitMQProducer import \
-    NebulaRabbitMQProducer
+from messaging.kafka.producer.NebulaKafkaProducer import NebulaKafkaProducer
+from messaging.mqtt.producer.NebulaMQTTProducer import NebulaMQTTProducer
+from messaging.rabbitMQ.producer.NebulaRabbitMQProducer import NebulaRabbitMQProducer
+
 # from redis.producer.NebulaRedisProducer import \
 #     NebulaRedisProducer
 
@@ -69,7 +67,7 @@ class NebulaRequestProducer:
     #     return NebulaRedisProducer(config[0], config[1])
 
     def get_request_payload(self, requestType: str, requestJson: str) -> RequestPayload:
-        requestPayload = RequestPayload(json.loads(requestJson))
+        requestPayload = RequestPayload()
         originSystem = ApplicationSystems()
         originSystem.id = 3
         system = ApplicationSystems()
