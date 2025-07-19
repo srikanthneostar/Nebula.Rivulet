@@ -345,7 +345,7 @@ py-cpuinfo==9.0.0
 pyarrow==19.0.0
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
-pyautogen==0.5.3
+ag2==0.5.3
 pybind11==2.13.6
 pycparser==2.22
 pycryptodome==3.21.0
