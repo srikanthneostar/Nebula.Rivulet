@@ -14,7 +14,10 @@ variables:
 services:
   - name: docker:24-dind
     alias: docker
-
+default:
+  tags:
+    - develop
+    
 cache:
   paths:
     - .cache/pip/
