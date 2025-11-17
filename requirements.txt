@@ -1,0 +1,12 @@
+python-jose
+fastapi
+cryptography
+pycryptodome
+pymongo
+celery
+pyodbc
+xgboost
+kafka-python
+paho-mqtt
+pika
+python-multipart
