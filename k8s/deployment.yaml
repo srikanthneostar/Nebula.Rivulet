@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nebula-rivulet
-  namespace: nebula-rivulet
+  namespace: core-insights-nebula
 spec:
   replicas: 1
   selector:
