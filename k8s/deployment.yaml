@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: nebula-rivulet
-          image: ${DOCKER_USR}/nebula-rivulet:latest
+          image: placeholder/nebula-rivulet:latest
           ports:
             - containerPort: 8000
           imagePullPolicy: Always
