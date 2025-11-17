@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nebula-rivulet-svc
+  namespace: nebula-rivulet
+spec:
+  selector:
+    app: nebula-rivulet
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 32000
+  type: LoadBalancer

@@ -1,0 +1,31 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nebula-rivulet
+  namespace: nebula-rivulet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nebula-rivulet
+  template:
+    metadata:
+      labels:
+        app: nebula-rivulet
+    spec:
+      containers:
+        - name: nebula-rivulet
+          image: ${DOCKER_USR}/nebula-rivulet:latest
+          ports:
+            - containerPort: 8000
+          imagePullPolicy: Always
+          terminationMessagePath: /dev/termination-rivulet.log
+          terminationMessagePolicy: File
+          env:
+            - name: TZ
+              value: Asia/Kolkata
+            - name: NEBULA_RIVULET_HOME
+              value: /usr/Nebula.Rivulet/db
+      imagePullSecrets:
+        - name: regcred
