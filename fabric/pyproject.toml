@@ -7,22 +7,6 @@ name = "nebula.fabric"
 version = "3.10.0"
 description = "A powerful framework for running AI pipelines with Elasticsearch data"
 authors = [{ name = "Administrator", email = "administrator@xecutables.com" }]
-dependencies = [
-    "elasticsearch>=7.0.0,<8.0.0",
-    "pandas>=1.0.0",
-    "sentence-transformers==2.4.0",
-    "chromadb",
-    "chroma",
-    "ollama",
-    "jq",
-    "langchain",
-    "langchain_chroma",
-    "langchain-community",
-    "langchain-openai",
-    "python-dotenv",
-    "scikit-learn>=0.24.0",
-    "SQLAlchemy",
-]
 readme = "README.md"
 requires-python = ">=3.12"
 
