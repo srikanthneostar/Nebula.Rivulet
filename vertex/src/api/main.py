@@ -66,6 +66,17 @@ class SearchResponse(BaseModel):
 
 es_service = ElasticService(["http://localhost:9200"])
 
+@app.get("/")
+async def root():
+    """Root endpoint"""
+    return {"message": "Rivulet is running..."}
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Kubernetes probes"""
+    return {"status": "healthy"}
+
 
 @app.post("/login", response_model=TokenResponse, tags=["authentication"])
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):

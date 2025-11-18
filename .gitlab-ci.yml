@@ -68,6 +68,6 @@ update-container-image:
   script:
     - echo "Updating deployment with new image..."
     - kubectl set image deployment/nebula-rivulet nebula-rivulet=$REGISTRY_TAG -n core-insights-nebula
-    - kubectl rollout status deployment/nebula-rivulet --timeout=120s -n core-insights-nebula
+    - kubectl rollout status deployment/nebula-rivulet --timeout=5m -n core-insights-nebula
   needs:
     - job: kubernetes-apply
