@@ -15,8 +15,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY fabric/dist/nebula_fabric-3.10.0-py3-none-any.whl /tmp/
 RUN pip install --no-cache-dir /tmp/nebula_fabric-3.10.0-py3-none-any.whl && rm /tmp/nebula_fabric-3.10.0-py3-none-any.whl
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# COPY requirements.txt .
+# RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy database
 RUN mkdir -p /usr/Nebula.Rivulet/db
