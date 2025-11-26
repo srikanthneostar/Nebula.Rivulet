@@ -1,18 +1,17 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="nebula-rivulet",
-    version="0.1.0",
-    packages=find_packages(where="src"),
-    package_dir={"": "src"},
+    name="nebula.rivulet",
+    version="3.10.0",
+    packages=find_packages(where="build/lib"),
+    package_dir={"": "build/lib"},
     install_requires=[
-        "elasticsearch>=7.0.0",
-        "pandas>=1.0.0",
-        "scikit-learn>=0.24.0",
+        "pymongo",
+        "sentence-transformers"
     ],
     author="Administrator",
-    author_email="your.email@example.com",
-    description="A framework for running AI pipelines with Elasticsearch data",
+    author_email="administrator@xecutables.com",
+    description="Pipeline framework for Nebula - provides data sources, stages, and pipeline orchestration",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="http://192.168.1.165/root/nebula-rivulet",

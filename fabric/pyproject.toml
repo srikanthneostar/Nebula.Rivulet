@@ -5,10 +5,24 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "nebula.fabric"
 version = "3.10.0"
-description = "A powerful framework for running AI pipelines with Elasticsearch data"
+description = "Base framework for Nebula Rivulet - provides core services, messaging, embeddings, and algorithms"
 authors = [{ name = "Administrator", email = "administrator@xecutables.com" }]
 readme = "README.md"
 requires-python = ">=3.12"
+dependencies = [
+    "xgboost",
+    "chromadb",
+    "langchain",
+    "langchain-community",
+    "langchain-chroma",
+    "langchain-core",
+    "ollama",
+    "pyodbc",
+    "sqlalchemy",
+    "kafka-python",
+    "paho-mqtt",
+    "pika",
+]
 
 [project.urls]
 Homepage = "https://github.com/yourusername/nebula.rivulet"

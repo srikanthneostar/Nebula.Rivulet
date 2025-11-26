@@ -1,12 +1,25 @@
-
-```python:/pyproject.toml
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "nebula.rivulet"
+version = "3.10.0"
+description = "Pipeline framework for Nebula - provides data sources, stages, and pipeline orchestration"
+authors = [{ name = "Administrator", email = "administrator@xecutables.com" }]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pymongo",
+    "sentence-transformers"
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/nebula.rivulet"
 
 [tool.black]
 line-length = 88
-target-version = ['py37']
+target-version = ['py312']
 include = '\.pyi?$'
 
 [tool.isort]

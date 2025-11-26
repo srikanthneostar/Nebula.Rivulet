@@ -33,3 +33,16 @@ fabric/build/lib/database/__pycache__/
 configurations/rivulet_db/
 configurations/context_db
 fabric/build/lib/nebula.fabric.egg-info/
+vertex\build\lib\nebula.vertex.egg-info
+rivulet/build/lib/knowledge/__pycache__/
+rivulet/build/lib/nebula.rivulet.egg-info/
+rivulet/build/lib/stages/__pycache__/
+vertex/build/lib/nebula.vertex.egg-info
+rivulet/build/lib/framework/__pycache__/
+rivulet/build/lib/pipelines/__pycache__/
+rivulet/build/lib/services/__pycache__
+vertex/src/nebula.vertex.egg-info/
+vertex/src/__pycache__/
+rivulet/build/lib/datasources/__pycache__/
+vertex/src/app.log
+commons/rivulet_db/3fe22a4d-a3c1-4120-9ee6-6b0c665675e7/

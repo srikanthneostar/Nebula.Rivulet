@@ -3,24 +3,20 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nebula.rivulet.fabric"
+name = "nebula.vertex"
 version = "3.10.0"
-description = "A powerful framework for running AI pipelines with Elasticsearch data"
+description = "REST API layer for Nebula Rivulet - provides FastAPI endpoints for search and ML operations"
 authors = [
     {name = "Administrator", email = "administrator@xecutables.com"},
 ]
 dependencies = [
-        "elasticsearch>=7.0.0,<8.0.0",
-        "pandas>=1.0.0",
-        "sentence-transformers",
-        "chromadb",
-        "chroma",
-        "jq",
-        "langchain",
-        "langchain-community",
-        "langchain-openai",
-        "python-dotenv",
-        "scikit-learn>=0.24.0",
+    "fastapi",
+    "uvicorn",
+    "python-jose[cryptography]",
+    "python-multipart",
+    "celery",
+    "pydantic",
+    "pycryptodome"
 ]
 readme = "README.md"
 requires-python = ">=3.12"

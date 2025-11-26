@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.env/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Build artifacts (keep only dist wheels)
+fabric/build/
+rivulet/build/
+vertex/build/
+fabric/src/
+rivulet/src/
+vertex/src/
+
+# Logs
+*.log
+app.log
+
+# Test files
+**/tests/
+**/__pycache__/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Keep only what we need
+!fabric/dist/*.whl
+!rivulet/dist/*.whl
+!vertex/dist/*.whl
+!commons/
