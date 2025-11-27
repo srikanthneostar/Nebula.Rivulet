@@ -27,8 +27,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application source files to /app (main.py, auth.py, app.py, etc.)
-COPY vertex/src/main.py vertex/src/auth.py /app/
-# COPY vertex/src/cert.pem vertex/src/key.pem /app/
+COPY vertex/src/ /app/
 
 # Copy database
 RUN mkdir -p /usr/Nebula.Rivulet/db

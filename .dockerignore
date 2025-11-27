@@ -55,3 +55,5 @@ Thumbs.db
 !rivulet/dist/*.whl
 !vertex/dist/*.whl
 !commons/
+!vertex/src/**
+
