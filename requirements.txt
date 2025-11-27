@@ -16,7 +16,6 @@ ollama
 jq
 langchain
 langchain-community
-langchain-openai
 python-dotenv
 SQLAlchemy
 xgboost

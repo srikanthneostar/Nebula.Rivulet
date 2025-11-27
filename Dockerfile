@@ -26,6 +26,9 @@ RUN pip install --no-cache-dir /tmp/nebula_fabric-3.10.0-py3-none-any.whl && \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy application code
+COPY vertex/src/ /app/
+
 # Copy database
 RUN mkdir -p /usr/Nebula.Rivulet/db
 COPY commons/Nebula.Rivulet.db /usr/Nebula.Rivulet/db/
