@@ -26,8 +26,9 @@ RUN pip install --no-cache-dir /tmp/nebula_fabric-3.10.0-py3-none-any.whl && \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY vertex/src/ /app/
+# Copy application source files to /app (main.py, auth.py, app.py, etc.)
+COPY vertex/src/main.py vertex/src/auth.py /app/
+# COPY vertex/src/cert.pem vertex/src/key.pem /app/
 
 # Copy database
 RUN mkdir -p /usr/Nebula.Rivulet/db
@@ -45,5 +46,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
 
-# Command to run the application (simplified - no complex paths needed!)
+# Command to run the application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
