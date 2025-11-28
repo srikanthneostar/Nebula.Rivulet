@@ -67,6 +67,6 @@ update-container-image:
   image: bitnami/kubectl:1.27
   script:
     - kubectl set image deployment/nebula-rivulet nebula-rivulet=$REGISTRY_TAG -n core-insights-nebula
-    - kubectl rollout status deployment/nebula-rivulet -n core-insights-nebula
+    - kubectl rollout status deployment/nebula-rivulet -n core-insights-nebula --timeout=900s
   needs:
     - job: kubernetes-apply
