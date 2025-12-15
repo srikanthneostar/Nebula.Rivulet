@@ -1,12 +1,11 @@
 from pymongo import MongoClient
 from typing import List, Union
-from datetime import datetime
-from bson import ObjectId
+
 
 class MongoService:
-    def __init__(self,hosts: Union[str, List[str]], **kwargs):
+    def __init__(self, hosts: Union[str, List[str]], **kwargs):
         self.client = MongoClient(hosts, **kwargs)
-    
+
     @staticmethod
     def entityMapper(entityid):
         ENTITY_MAP = {
@@ -17,14 +16,6 @@ class MongoService:
             # Add more mappings as needed
         }
         return ENTITY_MAP.get(str(entityid), "UNKNOWN_ENTITY")
-    
-    @staticmethod
-    def json_serializer(obj):
-        if isinstance(obj, (datetime,)):
-            return obj.isoformat()
-        if isinstance(obj, ObjectId):
-            return str(obj)
-        return str(obj)  # fallback for other non-serializable types
 
     def search_by_id(self, db_name, entityid, ids):
         db = self.client[db_name]

@@ -18,6 +18,7 @@ setup(
         "kafka-python",
         "paho-mqtt",
         "pika",
+        "redis",
     ],
     author="Administrator",
     author_email="administrator@xecutables.com",

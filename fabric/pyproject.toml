@@ -22,6 +22,7 @@ dependencies = [
     "kafka-python",
     "paho-mqtt",
     "pika",
+    "redis",
 ]
 
 [project.urls]

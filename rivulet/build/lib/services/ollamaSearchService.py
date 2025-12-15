@@ -5,6 +5,8 @@ import os
 from llms.ollamaService import OllamaService
 import json
 import uuid
+from datetime import datetime
+from bson import ObjectId
 from enums.chat_enum import ChatHistoryType
 from chatHistoryFactory.chat import ChatHistoryFactory
 from knowledge.config_util import ConfigUtil
@@ -28,12 +30,23 @@ class OllamaSearch:
         os.makedirs(self.context_path, exist_ok=True)
 
         es_config = self.appConfigProvider.get_config_by_category("MONGODB")
+        self.mongodb_host = [
+            config for config in es_config if config.key == "mongodb.hosts"
+        ][0].value
         self.mongodb_dbname = [
             config for config in es_config if config.key == "mongodb.dbname"
         ][0].value
 
         self.mongoclient = MongoService(self.mongodb_host)
         self.logger = get_fabric_logger(__name__, "chat_log.log")
+
+    @staticmethod
+    def json_serializer(obj):
+        if isinstance(obj, (datetime,)):
+            return obj.isoformat()
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        return str(obj)  # fallback for other non-serializable types
 
     def search_MongoDB(self, entityid, ids, old_guid=None):
         self.logger.info(f"Searching MongoDB for entityid: {entityid} and ids: {ids}")
@@ -50,7 +63,7 @@ class OllamaSearch:
                     f,
                     indent=4,
                     ensure_ascii=False,
-                    default=OllamaSearch.json_serializer,
+                    default=self.json_serializer,
                 )
             return [{"guid": guid}]
         elif old_guid is not None:
