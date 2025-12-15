@@ -50,7 +50,7 @@ class OllamaSearch:
 
     def search_MongoDB(self, entityid, ids, old_guid=None):
         self.logger.info(f"Searching MongoDB for entityid: {entityid} and ids: {ids}")
-        db = self.mongodb_dbname
+        db = str(self.mongodb_dbname)
         results = self.mongoclient.search_by_id(db, entityid, ids)
         self.logger.info((results))
 
