@@ -7,7 +7,6 @@ import json
 import uuid
 from enums.chat_enum import ChatHistoryType
 from chatHistoryFactory.chat import ChatHistoryFactory
-from pymongo import MongoClient
 from knowledge.config_util import ConfigUtil
 from database.mongoService import MongoService
 
@@ -29,8 +28,8 @@ class OllamaSearch:
         os.makedirs(self.context_path, exist_ok=True)
 
         es_config = self.appConfigProvider.get_config_by_category("MONGODB")
-        self.mongodb_host = [
-            config for config in es_config if config.key == "mongodb.hosts"
+        self.mongodb_dbname = [
+            config for config in es_config if config.key == "mongodb.dbname"
         ][0].value
 
         self.mongoclient = MongoService(self.mongodb_host)
@@ -38,8 +37,7 @@ class OllamaSearch:
 
     def search_MongoDB(self, entityid, ids, old_guid=None):
         self.logger.info(f"Searching MongoDB for entityid: {entityid} and ids: {ids}")
-        client = MongoClient(self.mongodb_host)
-        db = client["nebula"]
+        db = self.mongodb_dbname
         results = self.mongoclient.search_by_id(db, entityid, ids)
         self.logger.info((results))
 
