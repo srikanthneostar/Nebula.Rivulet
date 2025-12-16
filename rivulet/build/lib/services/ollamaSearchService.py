@@ -55,6 +55,7 @@ class OllamaSearch:
             if hasattr(self.mongodb_dbname, "name")
             else self.mongodb_dbname
         )
+        self.logger.info(f"db_name must be str, got {type(db_name)}")
         if not isinstance(db_name, str):
             raise TypeError(
                 self.logger.info(f"db_name must be str, got {type(db_name)}")
