@@ -33,9 +33,7 @@ class OllamaSearch:
         self.mongodb_host = [
             config for config in es_config if config.key == "mongodb.hosts"
         ][0].value
-        self.mongodb_dbname = [
-            config for config in es_config if config.key == "mongodb.dbname"
-        ][0].value
+        self.mongodb_dbname = "nebula"
 
         self.mongoclient = MongoService(self.mongodb_host)
         self.logger = get_fabric_logger(__name__, "chat_log.log")
@@ -50,18 +48,7 @@ class OllamaSearch:
 
     def search_MongoDB(self, entityid, ids, old_guid=None):
         self.logger.info(f"Searching MongoDB for entityid: {entityid} and ids: {ids}")
-        self.logger.info(f"db_name must be str, got {type(self.mongodb_dbname)}")
-        db_name = (
-            self.mongodb_dbname
-            if hasattr(self.mongodb_dbname, "name")
-            else self.mongodb_dbname
-        )
-        self.logger.info(f"db_name must be str, got {type(db_name)}")
-        if not isinstance(db_name, str):
-            raise TypeError(
-                self.logger.info(f"db_name must be str, got {type(db_name)}")
-            )
-        results = self.mongoclient.search_by_id(db_name, entityid, ids)
+        results = self.mongoclient.search_by_id(self.mongodb_dbname, entityid, ids)
         self.logger.info(results)
         if results and not old_guid:
             guid = str(uuid.uuid4())
