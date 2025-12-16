@@ -47,7 +47,9 @@ class OllamaSearch:
         return str(obj)  # fallback for other non-serializable types
 
     def search_MongoDB(self, entityid, ids, old_guid=None):
-        self.logger.info(f"Searching MongoDB for entityid: {entityid} and ids: {ids}")
+        self.logger.info(
+            f"Searching MongoDB for entityid: {entityid} and ids: {ids}, Host: {self.mongodb_host}"
+        )
         results = self.mongoclient.search_by_id(self.mongodb_dbname, entityid, ids)
         self.logger.info(results)
         if results and not old_guid:
