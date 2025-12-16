@@ -26,11 +26,13 @@ def json_serializer(obj):
 
 def test_mongo_connection(entityid, ids):
     client = MongoClient("mongodb://sa:Nebula=2020@192.168.1.240:27017/")
-
+    db_name = "nebula"
     try:
-        db = client["nebula"]
+        db = client[db_name]
+        print(f"Connected to database: {db}")
         collection_name = entityMapper(entityid)
         collection = db[collection_name]
+        print(f"Using collection: {collection}")
 
         qry = {"_id": {"$in": ids}}
         cur = collection.find(qry)
@@ -58,4 +60,4 @@ def test_mongo_connection(entityid, ids):
 
 
 # Example usage
-test_mongo_connection(60, [1, 1481, 1482])
+test_mongo_connection(60, [32, 28, 24, 20, 345, 347, 349])
