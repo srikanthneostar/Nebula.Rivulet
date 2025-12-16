@@ -1,12 +1,10 @@
 from pymongo import MongoClient
 from typing import List, Union
-from logs.logs import get_fabric_logger
 
 
 class MongoService:
     def __init__(self, hosts: Union[str, List[str]], **kwargs):
         self.client = MongoClient(hosts, **kwargs)
-        self.logger = get_fabric_logger(__name__, "chat_log.log")
 
     @staticmethod
     def entityMapper(entityid):
@@ -20,9 +18,7 @@ class MongoService:
         return ENTITY_MAP.get(str(entityid), "UNKNOWN_ENTITY")
 
     def search_by_id(self, db_name: str, entityid, ids):
-        self.logger.info(f"db_name must be str, got {type(db_name)}")
         db = self.client[db_name]
-        self.logger.info("db name is", db)
         collection_name = self.entityMapper(entityid)
         collection = db[collection_name]
         qry = {"_id": {"$in": ids}}
