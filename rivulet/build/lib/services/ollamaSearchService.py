@@ -51,10 +51,11 @@ class OllamaSearch:
     def search_MongoDB(self, entityid, ids, old_guid=None):
         self.logger.info(f"Searching MongoDB for entityid: {entityid} and ids: {ids}")
         db_name = (
-            self.mongodb_dbname.name
+            self.mongodb_dbname
             if hasattr(self.mongodb_dbname, "name")
             else self.mongodb_dbname
         )
+        self.logger.info(f"db_name must be str, got {type(db_name)}", db_name)
         if not isinstance(db_name, str):
             raise TypeError(
                 self.logger.info(f"db_name must be str, got {type(db_name)}")
