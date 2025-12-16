@@ -50,10 +50,17 @@ class OllamaSearch:
 
     def search_MongoDB(self, entityid, ids, old_guid=None):
         self.logger.info(f"Searching MongoDB for entityid: {entityid} and ids: {ids}")
-        db = str(self.mongodb_dbname)
-        results = self.mongoclient.search_by_id(db, entityid, ids)
-        self.logger.info((results))
-
+        db_name = (
+            self.mongodb_dbname.name
+            if hasattr(self.mongodb_dbname, "name")
+            else self.mongodb_dbname
+        )
+        if not isinstance(db_name, str):
+            raise TypeError(
+                self.logger.info(f"db_name must be str, got {type(db_name)}")
+            )
+        results = self.mongoclient.search_by_id(db_name, entityid, ids)
+        self.logger.info(results)
         if results and not old_guid:
             guid = str(uuid.uuid4())
             file_path = os.path.join(self.context_path, f"{guid}.json")
