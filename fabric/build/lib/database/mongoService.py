@@ -17,10 +17,10 @@ class MongoService:
         }
         return ENTITY_MAP.get(str(entityid), "UNKNOWN_ENTITY")
 
-    def search_by_id(self, db_name: str, entityid, ids):
+    def search_by_id(self, db_name, entityid, ids):
         db = self.client[db_name]
         collection_name = self.entityMapper(entityid)
-        collection = db[collection_name]
+        collection = db.name[collection_name]
         qry = {"_id": {"$in": ids}}
         col = collection.find(qry)
         results = list(col)
