@@ -39,6 +39,6 @@ spec:
               port: 8000
               scheme: HTTPS
             initialDelaySeconds: 10
-            periodSeconds: 5
+            periodSeconds: 10
       imagePullSecrets:
         - name: regcred

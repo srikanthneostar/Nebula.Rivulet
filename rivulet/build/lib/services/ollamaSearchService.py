@@ -33,7 +33,9 @@ class OllamaSearch:
         self.mongodb_host = [
             config for config in es_config if config.key == "mongodb.hosts"
         ][0].value
-        self.mongodb_dbname = "nebula"
+        self.mongodb_dbname = [
+            config for config in es_config if config.key == "mongodb.dbname"
+        ][0].value
 
         self.mongoclient = MongoService(self.mongodb_host)
         self.logger = get_fabric_logger(__name__, "chat_log.log")
