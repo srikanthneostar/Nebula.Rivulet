@@ -11,13 +11,9 @@ kafka-python
 paho-mqtt
 pika
 python-multipart
-chromadb
 ollama
 jq
-langchain
-langchain-community
 python-dotenv
 SQLAlchemy
 xgboost
 scikit-learn
-sentence-transformers

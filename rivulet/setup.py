@@ -7,7 +7,6 @@ setup(
     package_dir={"": "build/lib"},
     install_requires=[
         "pymongo",
-        "sentence-transformers"
     ],
     author="Administrator",
     author_email="administrator@xecutables.com",

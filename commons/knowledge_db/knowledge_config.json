@@ -4,15 +4,7 @@
         "db_name": "nebula"
     },
     {
-        "sort": [
-            {
-                "entity.ID": {
-                    "order": "asc"
-                }
-            }
-        ],
-        "query": {},
-        "prompt": "You are an intelligent assistant trained to generate meaningful and context-aware questions and generate 3 random questions"
+        "query": {}
     },
     {
         "ollama_prompt": "You are a helpful assistant. Your task is to answer questions only based on the provided context. If the question cannot be answered using the information in the context, you must respond with: 'I cannot answer this question based on the available context.'"

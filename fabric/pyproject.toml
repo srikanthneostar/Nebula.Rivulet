@@ -5,17 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "nebula.fabric"
 version = "3.10.0"
-description = "Base framework for Nebula Rivulet - provides core services, messaging, embeddings, and algorithms"
+description = "Base framework for Nebula Rivulet - provides core services, messaging, and algorithms"
 authors = [{ name = "Administrator", email = "administrator@xecutables.com" }]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "xgboost",
-    "chromadb",
-    "langchain",
-    "langchain-community",
-    "langchain-chroma",
-    "langchain-core",
     "ollama",
     "pyodbc",
     "sqlalchemy",

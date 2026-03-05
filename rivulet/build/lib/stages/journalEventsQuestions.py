@@ -2,7 +2,6 @@ from framework.pipeline_stage import PipelineStage
 from configuration.appConfigProvider import AppConfigProvider
 from llms.ollamaService import OllamaService
 from logs.logs import get_fabric_logger
-from knowledge.config_util import ConfigUtil
 from database.mongoService import MongoService
 
 
@@ -16,7 +15,6 @@ class JournalEventQuestions(PipelineStage):
         self.db = self.mongoService.client["nebula"]
         self.ques = self.db["questions"]
         self.logger = get_fabric_logger(__name__)
-        self.configuration = ConfigUtil.get_knowledge_config(self)
 
     def process(self, data: any) -> any:
         questions = []

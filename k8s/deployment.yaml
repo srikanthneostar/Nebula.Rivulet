@@ -38,7 +38,9 @@ spec:
               path: /health
               port: 8000
               scheme: HTTPS
-            initialDelaySeconds: 10
-            periodSeconds: 10
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 5
       imagePullSecrets:
         - name: regcred

@@ -12,10 +12,4 @@ pika
 python-multipart
 ollama
 jq
-langchain
-langchain-community
-langchain-openai
-python-dotenv
-transformers==4.39.3
-sentence-transformers==2.4.0
 SQLAlchemy

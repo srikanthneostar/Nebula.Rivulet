@@ -25,6 +25,7 @@ class MongoService:
         )
         db = self.client[db_name]
         collection_name = self.entityMapper(entityid)
+        self.logger.info(f"Using collection: {collection_name}")
         collection = db[collection_name]
         qry = {"_id": {"$in": ids}}
         col = collection.find(qry)

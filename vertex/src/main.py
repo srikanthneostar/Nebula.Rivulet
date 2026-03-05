@@ -6,8 +6,6 @@ from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware import Middleware
 from auth import create_access_token, verify_token
-from services.chromaService import ChromaSearch
-from services.faissService import FaissSearch
 from services.ollamaSearchService import OllamaSearch
 from fastapi import BackgroundTasks
 from app import celery, get_api_task_status
@@ -43,11 +41,6 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
-
-class SearchRequest(BaseModel):
-    query: str
-    k: int
-    llmsearch: bool
 
 
 class ContextRequest(BaseModel):
@@ -89,79 +82,17 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     raise HTTPException(status_code=400, detail="Incorrect username or password")
 
 
-@app.post("/run_chroma_pipeline", tags=["search"])
-async def run_chroma_pipeline(background_tasks: BackgroundTasks, current_user: str = Depends(verify_token)):
+@app.post("/run_knowledge_questions", tags=["search"])
+async def run_knowledge_pipeline(background_tasks: BackgroundTasks, current_user: str = Depends(verify_token)):
     """
-    Run the Chroma pipeline.
+    Run the knowledge questions generation pipeline.
     """
     try:
         background_tasks.add_task(JournalEventsPipeline().run)
-        return {"message": "Chroma pipeline started"}
+        return {"message": "Knowledge questions pipeline started"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Chroma pipeline failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Knowledge questions pipeline failed: {str(e)}")
 
-
-@app.post("/chroma/search", tags=["search"])
-async def vertex_search(
-    request: SearchRequest, current_user: str = Depends(verify_token)
-):
-    """
-    Perform a search operation using Vertex Chroma Service.
-
-    - **query**: The search query to be processed
-    """
-    try:
-        if not request.query:
-            raise HTTPException(status_code=400, detail="Query cannot be empty")
-        qry = ChromaSearch()
-        results = qry.search_results(request.query, request.k, request.llmsearch)
-        return results
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Chroma search failed: {str(e)}")
-
-
-@app.post("/delete/id", tags=["search"])
-async def delete_by_id(
-    req_info: dict, current_user: str = Depends(verify_token)
-) -> List[Dict]:
-    """
-    Delete a document by its ID.
-    - **ids**: The list of IDs to be deleted
-    """
-    try:
-        if not req_info:
-            raise HTTPException(status_code=400, detail="ID cannot be empty")
-        qry = ChromaSearch()
-        ids = req_info["ids"]
-        results = qry.delete_collection(ids)
-        return [{"message": "Given ids are deleted"}] if results is None else results
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Document deletion failed: {str(e)}"
-        )
-
-
-@app.post("/faiss/search", tags=["search"])
-async def faiss_search(
-    request: SearchRequest, current_user: str = Depends(verify_token)
-) -> List[Dict]:
-    """
-    Perform a search operation using FAISS.
-    - **query**: The search query to be processed
-    """
-    try:
-        if not request.query:
-            raise HTTPException(status_code=400, detail="Query cannot be empty")
-        qry = FaissSearch()
-        results = qry.search_results(request.query)
-        serialized_results = [
-            result if isinstance(result, dict) else result.__dict__
-            for result in results
-        ]
-        return serialized_results
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"FAISS search failed: {str(e)}")
 
 
 @app.post("/context/search", tags=["search"])

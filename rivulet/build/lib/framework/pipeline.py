@@ -15,7 +15,7 @@ class Pipeline:
 
     def run(self, query: any) -> Any:
         data = self.data_source.get_data(query)
-        self.logger.info(f"Retrieved {len(data)} records from Elasticsearch")
+        self.logger.info(f"Retrieved {len(data)} records from MongoDB")
 
         for stage in self.stages:
             self.logger.info(f"Running stage: {stage.__class__.__name__}")
