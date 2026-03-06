@@ -7,8 +7,6 @@ import json
 import uuid
 from datetime import datetime
 from bson import ObjectId
-from enums.chat_enum import ChatHistoryType
-from chatHistoryFactory.chat import ChatHistoryFactory
 from knowledge.config_util import ConfigUtil
 from database.mongoService import MongoService
 
