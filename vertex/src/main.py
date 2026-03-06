@@ -42,7 +42,6 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
-
 class ContextRequest(BaseModel):
     entityid: int
     ids: List[int]
@@ -53,7 +52,6 @@ class SearchResponse(BaseModel):
     guid: str
     query: str
     session_id: str = None
-
 
 
 @app.get("/")
@@ -83,7 +81,9 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 @app.post("/run_knowledge_questions", tags=["search"])
-async def run_knowledge_pipeline(background_tasks: BackgroundTasks, current_user: str = Depends(verify_token)):
+async def run_knowledge_pipeline(
+    background_tasks: BackgroundTasks, current_user: str = Depends(verify_token)
+):
     """
     Run the knowledge questions generation pipeline.
     """
@@ -91,8 +91,9 @@ async def run_knowledge_pipeline(background_tasks: BackgroundTasks, current_user
         background_tasks.add_task(JournalEventsPipeline().run)
         return {"message": "Knowledge questions pipeline started"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Knowledge questions pipeline failed: {str(e)}")
-
+        raise HTTPException(
+            status_code=500, detail=f"Knowledge questions pipeline failed: {str(e)}"
+        )
 
 
 @app.post("/context/search", tags=["search"])
@@ -129,9 +130,7 @@ async def get_knowledge_questions(current_user: str = Depends(verify_token)):
         ques = SearchService()
         questions = ques.get_questions()
         if not questions:
-            raise HTTPException(
-                status_code=404, detail="No questions found!!"
-            )
+            raise HTTPException(status_code=404, detail="No questions found!!")
         return questions
 
     except Exception as e:
@@ -140,20 +139,20 @@ async def get_knowledge_questions(current_user: str = Depends(verify_token)):
         )
 
 
-@app.post("/chat_history/session", tags=["search"])
-async def get_session_chat_history(
-    request: dict, current_user: str = Depends(verify_token)
-):
-    try:
-        if not request["session_id"]:
-            raise HTTPException(status_code=400, detail="Session ID cannot be empty")
-        chat = OllamaSearch()
-        results = chat.get_session_chat(request["session_id"])
-        return results
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Session chat history retrieval failed: {str(e)}"
-        )
+# @app.post("/chat_history/session", tags=["search"])
+# async def get_session_chat_history(
+#     request: dict, current_user: str = Depends(verify_token)
+# ):
+#     try:
+#         if not request["session_id"]:
+#             raise HTTPException(status_code=400, detail="Session ID cannot be empty")
+#         chat = OllamaSearch()
+#         results = chat.get_session_chat(request["session_id"])
+#         return results
+#     except Exception as e:
+#         raise HTTPException(
+#             status_code=500, detail=f"Session chat history retrieval failed: {str(e)}"
+#         )
 
 
 @app.post("/detect/start/{task_name}")

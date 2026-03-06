@@ -89,18 +89,18 @@ class OllamaSearch:
             entities = json.load(f)
         data = json.dumps(entities)
 
-        valid_history_types = [t.value for t in ChatHistoryType]
-        if history_type.lower() not in valid_history_types:
-            raise ValueError(
-                f"Invalid history type: {history_type}. Expected one of {valid_history_types}"
-            )
-        history_type = ChatHistoryType(history_type.lower())
+        # valid_history_types = [t.value for t in ChatHistoryType]
+        # if history_type.lower() not in valid_history_types:
+        #     raise ValueError(
+        #         f"Invalid history type: {history_type}. Expected one of {valid_history_types}"
+        #     )
+        # history_type = ChatHistoryType(history_type.lower())
 
-        if session_id is None:
-            session_id = str(uuid.uuid4())
-        self.logger.info(f"Session ID: {session_id}")
-        chat_history = ChatHistoryFactory.create_chat_history(history_type, session_id)
-        chat_history.add_message("user", query)
+        # if session_id is None:
+        #     session_id = str(uuid.uuid4())
+        # self.logger.info(f"Session ID: {session_id}")
+        # chat_history = ChatHistoryFactory.create_chat_history(history_type, session_id)
+        # chat_history.add_message("user", query)
 
         prompt = (
             self.config[2]["ollama_prompt"]
@@ -115,8 +115,8 @@ class OllamaSearch:
         response = self.ollamaService.ollama_client.chat(
             model=self.model_name, messages=messages
         )
-        chat_history.add_message("assistant", response["message"]["content"])
-        chat_history.get_messages()
+        # chat_history.add_message("assistant", response["message"]["content"])
+        # chat_history.get_messages()
 
         self.logger.info(
             f"Adding response to chat_history \n: {response['message']['content']}\n"
@@ -124,17 +124,17 @@ class OllamaSearch:
 
         return {"session_id": session_id, "response": response["message"]["content"]}
 
-    def get_session_chat(self, session_id):
-        chat_config = self.appConfigProvider.get_config_by_category("CHAT_HISTORY")
-        history_type = [
-            config for config in chat_config if config.key == "HISTORY_TYPE"
-        ][0].value
-        valid_history_types = [t.value for t in ChatHistoryType]
-        if history_type.lower() not in valid_history_types:
-            raise ValueError(
-                f"Invalid history type: {history_type}. Expected one of {valid_history_types}"
-            )
-        history_type = ChatHistoryType(history_type.lower())
-        chat_history = ChatHistoryFactory.create_chat_history(history_type, session_id)
-        messages = chat_history.get_messages()
-        return messages
+    # def get_session_chat(self, session_id):
+    #     chat_config = self.appConfigProvider.get_config_by_category("CHAT_HISTORY")
+    #     history_type = [
+    #         config for config in chat_config if config.key == "HISTORY_TYPE"
+    #     ][0].value
+    #     valid_history_types = [t.value for t in ChatHistoryType]
+    #     if history_type.lower() not in valid_history_types:
+    #         raise ValueError(
+    #             f"Invalid history type: {history_type}. Expected one of {valid_history_types}"
+    #         )
+    #     # history_type = ChatHistoryType(history_type.lower())
+    #     # chat_history = ChatHistoryFactory.create_chat_history(history_type, session_id)
+    #     # messages = chat_history.get_messages()
+    #     return messages
