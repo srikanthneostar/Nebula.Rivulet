@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
-from fastapi.security import OAuth2PasswordRequestForm
 from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,7 +22,7 @@ app = FastAPI(
         )
     ],
     title="Nebula Rivulet",
-    description="API for performing authenticated Elasticsearch searches",
+    description="API for performing authenticated MongoDB searches",
     version="1.0.0",
     openapi_tags=[
         {"name": "authentication", "description": "Authentication operations"},
@@ -35,6 +34,11 @@ app = FastAPI(
 class SearchQuery(BaseModel):
     query: Dict = Field(..., example={"query": {"match": {"field": "value"}}})
     size: Optional[int] = Field(1000, description="Number of results to return")
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 
 class TokenResponse(BaseModel):
@@ -71,15 +75,12 @@ async def health_check():
 
 
 @app.post("/login", response_model=TokenResponse, tags=["authentication"])
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(request: LoginRequest):
     """
     Get access token for API authentication.
-
-    - **username**: Your username
-    - **password**: Your password
     """
-    if form_data.username == "admin" and form_data.password == "password":
-        access_token = create_access_token(data={"sub": form_data.username})
+    if request.username == "admin" and request.password == "password":
+        access_token = create_access_token(data={"sub": request.username})
         return {"access_token": access_token, "token_type": "bearer"}
     raise HTTPException(status_code=400, detail="Incorrect username or password")
 
