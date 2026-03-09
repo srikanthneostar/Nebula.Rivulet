@@ -15,10 +15,8 @@ class OllamaSearch:
     def __init__(self):
         self.appConfigProvider = AppConfigProvider()
         configs = self.appConfigProvider.get_config_by_category("OLLAMA")
-        host_address = [config for config in configs if config.key == "HOST"][0].value
-        self.model_name = [config for config in configs if config.key == "MODEL"][
-            0
-        ].value
+        host_address = next(c.value for c in configs if c.key == "OLLAMA_URL")
+        self.model_name = next(c.value for c in configs if c.key == "OLLAMA_MODEL")
         self.ollamaService = OllamaService(self.model_name, host_address)
         config_util = ConfigUtil()
         self.config = config_util.get_knowledge_config()
