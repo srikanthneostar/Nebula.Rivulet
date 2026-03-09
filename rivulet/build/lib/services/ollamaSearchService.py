@@ -1,5 +1,5 @@
 from logs.logs import get_fabric_logger
-from configuration.appConfigProvider import AppConfigProvider
+from configuration.appConfigProvider import AppConfigProvider, AppConfig
 from configuration.envConfig import EnvConfig
 import os
 from llms.ollamaService import OllamaService
@@ -136,3 +136,25 @@ class OllamaSearch:
     #     # chat_history = ChatHistoryFactory.create_chat_history(history_type, session_id)
     #     # messages = chat_history.get_messages()
     #     return messages
+
+    def update_ollama_url(self, url: str):
+        self.logger.info(f"Updating Ollama URL to: {url}")
+
+        config = AppConfig(
+            key="OLLAMA_URL",
+            value=url,
+            description="Ollama base URL",
+            category="OLLAMA",
+            isEncrypted=False
+        )
+
+        updated = self.appConfigProvider.update_config(config)
+
+        if not updated:
+            raise Exception("Failed to update Ollama URL")
+
+        return {
+            "message": "Ollama URL updated successfully",
+            "url": url
+        }
+        

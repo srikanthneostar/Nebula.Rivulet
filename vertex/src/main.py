@@ -54,6 +54,10 @@ class SearchResponse(BaseModel):
     session_id: str = None
 
 
+class UpdateOllamaURLRequest(BaseModel):
+    url: str = Field(..., example="http://localhost:11434")
+
+
 @app.get("/")
 async def root():
     """Root endpoint"""
@@ -139,20 +143,19 @@ async def get_knowledge_questions(current_user: str = Depends(verify_token)):
         )
 
 
-# @app.post("/chat_history/session", tags=["search"])
-# async def get_session_chat_history(
-#     request: dict, current_user: str = Depends(verify_token)
-# ):
-#     try:
-#         if not request["session_id"]:
-#             raise HTTPException(status_code=400, detail="Session ID cannot be empty")
-#         chat = OllamaSearch()
-#         results = chat.get_session_chat(request["session_id"])
-#         return results
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=500, detail=f"Session chat history retrieval failed: {str(e)}"
-#         )
+@app.post("/update_ollama_url")
+async def update_ollama_url(
+    request: UpdateOllamaURLRequest, current_user: str = Depends(verify_token)
+):
+    try:
+        if not request.url:
+            raise HTTPException(status_code=400, detail="URL cannot be empty")
+        url = OllamaSearch().update_ollama_url(request.url)
+        return {"message": "Ollama URL updated successfully", "url": url}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to update Ollama URL: {str(e)}"
+        )
 
 
 @app.post("/detect/start/{task_name}")
