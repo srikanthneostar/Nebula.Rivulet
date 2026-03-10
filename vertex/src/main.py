@@ -55,7 +55,7 @@ class ContextRequest(BaseModel):
 class SearchResponse(BaseModel):
     guid: str
     query: str
-    session_id: str = None
+    # session_id: str = None
 
 
 class UpdateOllamaURLRequest(BaseModel):
@@ -123,7 +123,7 @@ async def llm_search(
         if not request.query:
             raise HTTPException(status_code=400, detail="Query cannot be empty")
         qry = OllamaSearch()
-        results = qry.search_Ollama(request.guid, request.query, request.session_id)
+        results = qry.search_Ollama(request.guid, request.query)
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")

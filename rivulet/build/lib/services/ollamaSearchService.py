@@ -72,7 +72,7 @@ class OllamaSearch:
             return [{"guid": old_guid}]
         return results
 
-    def search_Ollama(self, guid, query, session_id: str = None, max_history: int = 10):
+    def search_Ollama(self, guid, query, max_history: int = 10):
         self.logger.info(f"Searching Ollama for entities: {guid} and query: {query}")
         file_path = os.path.join(self.context_path, f"{guid}.json")
 
@@ -114,11 +114,12 @@ class OllamaSearch:
         # chat_history.add_message("assistant", response["message"]["content"])
         # chat_history.get_messages()
 
-        self.logger.info(
-            f"Adding response to chat_history \n: {response['message']['content']}\n"
-        )
-
-        return {"session_id": session_id, "response": response["message"]["content"]}
+        # self.logger.info(
+        #     f"Adding response to chat_history \n: {response['message']['content']}\n"
+        # )
+        
+        self.logger.info(f"Ollama Response: {response["message"]["content"]}")
+        return {"response": response["message"]["content"]}
 
     # def get_session_chat(self, session_id):
     #     chat_config = self.appConfigProvider.get_config_by_category("CHAT_HISTORY")
