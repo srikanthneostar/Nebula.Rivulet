@@ -1,5 +1,5 @@
 from logs.logs import get_fabric_logger
-from configuration.appConfigProvider import AppConfigProvider, AppConfig
+from configuration.appConfigProvider import AppConfigProvider
 from configuration.envConfig import EnvConfig
 import os
 from llms.ollamaService import OllamaService
@@ -76,10 +76,10 @@ class OllamaSearch:
         self.logger.info(f"Searching Ollama for entities: {guid} and query: {query}")
         file_path = os.path.join(self.context_path, f"{guid}.json")
 
-        chat_config = self.appConfigProvider.get_config_by_category("CHAT_HISTORY")
-        history_type = [
-            config for config in chat_config if config.key == "HISTORY_TYPE"
-        ][0].value
+        # chat_config = self.appConfigProvider.get_config_by_category("CHAT_HISTORY")
+        # history_type = [
+        #     config for config in chat_config if config.key == "HISTORY_TYPE"
+        # ][0].value
 
         with open(file_path, "r") as f:
             entities = json.load(f)
@@ -138,18 +138,19 @@ class OllamaSearch:
     def update_ollama_url(self, url: str):
         self.logger.info(f"Updating Ollama URL to: {url}")
 
-        config = AppConfig(
-            key="OLLAMA_URL",
-            value=url,
-            description="Ollama base URL",
-            category="OLLAMA",
-            isEncrypted=False
-        )
-
-        updated = self.appConfigProvider.update_config(config)
+        # Get existing config first
+        existing_config = self.appConfigProvider.get_config("OLLAMA_URL")
+        
+        # Update with new values
+        existing_config.value = url
+        
+        updated = self.appConfigProvider.update_config(existing_config)
 
         if not updated:
             raise Exception("Failed to update Ollama URL")
+
+        # Reinitialize OllamaService with new URL
+        self.ollamaService = OllamaService(self.model_name, url)
 
         return {
             "message": "Ollama URL updated successfully",
