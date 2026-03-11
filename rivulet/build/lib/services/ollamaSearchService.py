@@ -159,7 +159,7 @@ class OllamaSearch:
         }
         
 
-    def update_ollama_model(self, model_name: str):
+    def update_model(self, model_name: str):
         self.logger.info(f"Updating Ollama model to: {model_name}")
 
         # Get existing config first
