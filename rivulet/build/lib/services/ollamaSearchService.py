@@ -158,3 +158,25 @@ class OllamaSearch:
             "url": url
         }
         
+
+    def update_ollama_model(self, model_name: str):
+        self.logger.info(f"Updating Ollama model to: {model_name}")
+
+        # Get existing config first
+        existing_config = self.appConfigProvider.get_config("OLLAMA_MODEL")
+        
+        # Update with new values
+        existing_config.value = model_name
+        
+        updated = self.appConfigProvider.update_config(existing_config)
+
+        if not updated:
+            raise Exception("Failed to update Ollama model")
+
+        # Reinitialize OllamaService with new model
+        self.ollamaService = OllamaService(model_name, self.ollamaService.host_address)
+
+        return {
+            "message": "Ollama model updated successfully",
+            "model": model_name
+        }

@@ -61,6 +61,8 @@ class SearchResponse(BaseModel):
 class UpdateOllamaURLRequest(BaseModel):
     url: str = Field(..., example="http://localhost:11434")
 
+class UpdateOllamaModelRequest(BaseModel):
+    model_name: str = Field(..., example="llama3.1")
 
 @app.get("/")
 async def root():
@@ -156,6 +158,20 @@ async def update_ollama_url(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to update Ollama URL: {str(e)}"
+        )
+
+@app.post("/update_ollama_model")
+async def update_ollama_model(
+    request: UpdateOllamaModelRequest, current_user: str = Depends(verify_token)
+):
+    try:
+        if not request.model_name:
+            raise HTTPException(status_code=400, detail="Model name cannot be empty")
+        model = OllamaSearch().update_model(request.model_name)
+        return {"message": "Ollama model updated successfully", "model": model}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to update Ollama model: {str(e)}"
         )
 
 
