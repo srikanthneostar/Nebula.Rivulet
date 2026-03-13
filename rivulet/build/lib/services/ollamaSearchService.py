@@ -15,9 +15,9 @@ class OllamaSearch:
     def __init__(self):
         self.appConfigProvider = AppConfigProvider()
         configs = self.appConfigProvider.get_config_by_category("OLLAMA")
-        host_address = next(c.value for c in configs if c.key == "OLLAMA_URL")
+        self.host_address = next(c.value for c in configs if c.key == "OLLAMA_URL")
         self.model_name = next(c.value for c in configs if c.key == "OLLAMA_MODEL")
-        self.ollamaService = OllamaService(self.model_name, host_address)
+        self.ollamaService = OllamaService(self.model_name, self.host_address)
         config_util = ConfigUtil()
         self.config = config_util.get_knowledge_config()
         config = EnvConfig()
@@ -174,7 +174,7 @@ class OllamaSearch:
             raise Exception("Failed to update Ollama model")
 
         # Reinitialize OllamaService with new model
-        self.ollamaService = OllamaService(model_name, self.ollamaService.host_address)
+        self.ollamaService = OllamaService(model_name, self.host_address)
 
         return {
             "message": "Ollama model updated successfully",
