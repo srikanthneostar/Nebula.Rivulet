@@ -46,3 +46,6 @@ vertex/src/__pycache__/
 rivulet/build/lib/datasources/__pycache__/
 vertex/src/app.log
 commons/rivulet_db/3fe22a4d-a3c1-4120-9ee6-6b0c665675e7/
+fabric/__pycache__/
+fabric/build/lib/encryption/__pycache__/
+*.pyc

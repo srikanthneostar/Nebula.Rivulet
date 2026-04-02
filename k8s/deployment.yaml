@@ -39,7 +39,7 @@ spec:
               port: 8000
               scheme: HTTPS
             initialDelaySeconds: 15
-            periodSeconds: 15
+            periodSeconds: 20
             timeoutSeconds: 10
             failureThreshold: 5
       imagePullSecrets:
